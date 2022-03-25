@@ -1,0 +1,16 @@
+.box {
+    margin: 8px;
+    padding: 8px;
+    background-color: aliceblue;
+    border-radius: 8px;
+    width: 400px;
+    box-shadow: darkgray 4px 4px 4px 4px;
+}
+.create-election-view, .create-election-view-table {
+    height: 100%;
+}
+.create-election-view-table {
+    display:flex;
+    align-items: start;
+    justify-content: center;
+}

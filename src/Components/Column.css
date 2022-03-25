@@ -1,0 +1,23 @@
+.column {
+    margin: 8px;
+    padding: 8px;
+    background-color: aliceblue;
+    border-radius: 8px;
+    width: 400px;
+    box-shadow: darkgray 4px 4px 4px 4px;
+}
+.column-header {
+    display: flex;
+    margin: 8px;
+}
+.column-row {
+    display:flex;
+    align-items: center;
+}
+.column-row label {
+    padding-right: 8px;
+}
+
+.column label {
+    text-align: left;
+}
