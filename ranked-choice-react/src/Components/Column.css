@@ -21,3 +21,8 @@
 .column label {
     text-align: left;
 }
+.add-new-card{
+   padding:8px;
+    display:flex;
+    align-items: center;
+}

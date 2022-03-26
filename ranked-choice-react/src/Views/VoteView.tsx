@@ -21,7 +21,7 @@ export function VoteView() {
             .then(res => res.json())
             .then(
                 (result) => {
-                   dispatch({type:CardTableActionType.SetCandidates, candidates: result, choices:[]})
+                   dispatch({type:CardTableActionType.SetCards, cards: [result,[]]})
                 },
                 (error) => {
 

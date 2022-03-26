@@ -73,11 +73,12 @@ export function Card(props : CardProps) {
     return <div ref={ref} className={"card"} style={{opacity: isOver? 0.5 : 1}}>
 
         {props.canEdit && !editing && <label onDoubleClick={event => setState({editing: true})}>{props.card.text}</label>}
-        {props.canEdit && editing && <input onBlur={event => {
-            props.dispatch({type:CardTableActionType.EditCard, card:{...props.card, text:event.target.value}, index: props.index, column: props.column})
+        {props.canEdit && editing && <textarea onBlur={event => {
 
+            props.dispatch({type:CardTableActionType.EditCard, card:{...props.card, text:event.target.value}, index: props.index, column: props.column})
             setState({editing: false})
-            }} defaultValue={props.card.text}/>
+
+            }}  defaultValue={props.card.text}/>
         }
 
         {!props.canEdit && <label>{props.card.text}</label>}

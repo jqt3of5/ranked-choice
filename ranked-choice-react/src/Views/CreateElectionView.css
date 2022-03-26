@@ -6,8 +6,12 @@
     width: 400px;
     box-shadow: darkgray 4px 4px 4px 4px;
 }
-.create-election-view, .create-election-view-table {
+.create-election-view{
     height: 100%;
+    display:flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
 }
 .create-election-view-table {
     display:flex;

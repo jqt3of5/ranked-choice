@@ -44,7 +44,9 @@ export function Column(props : ColumnProps) {
 
         { props.cards.map((card, index) =>
             <div className={"column-row"}>
+                
                 {props.showRank && <label><b>{index}</b> </label>}
+
                 <Card key={card.id} card={card}
                       index={index} column={props.column}
                       canEdit={props.canEdit} canReorder={props.canReorder}
@@ -63,7 +65,7 @@ export function Column(props : ColumnProps) {
             )
         */}
 
-        {props.canEdit && <div className={"addNewCard"} onClick={event => props.dispatch({type:CardTableActionType.AddCard, column:props.column})}><IoAdd/>Add new card</div>}
+        {props.canEdit && <div className={"add-new-card"} onClick={event => props.dispatch({type:CardTableActionType.AddCard, column:props.column})}><IoAdd/>Add new card</div>}
     </div>
 }
 

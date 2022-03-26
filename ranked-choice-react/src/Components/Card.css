@@ -1,10 +1,16 @@
 .card{
-    margin:8px;
+    margin:4px;
     padding:8px;
     padding-left: 12px;
     border-radius: 2px;
     background-color: white;
     box-shadow: lightgrey 2px 2px 2px 2px;
     display:flex;
+    flex-grow: 1;
+}
+.card label {
+    flex-grow: 1;
+}
+.card textarea {
     flex-grow: 1;
 }

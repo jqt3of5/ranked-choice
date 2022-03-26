@@ -4,14 +4,14 @@ export interface CardTableState
     table: CardData[][]
 }
 export enum CardTableActionType {
-    SetCandidates,
+    SetCards,
     AddCard,
     DeleteCard,
     EditCard,
     MoveCard
 }
 export type CardTableAction =
-    | {type: CardTableActionType.SetCandidates, candidates : CardData[], choices:CardData[]}
+    | {type: CardTableActionType.SetCards, cards: CardData[][]}
     | {type: CardTableActionType.AddCard, column:number}
     | {type: CardTableActionType.DeleteCard, index: number, column:number}
     | {type: CardTableActionType.EditCard, card:CardData, index: number, column: number}
@@ -21,8 +21,8 @@ export function reduce(state : CardTableState, action : CardTableAction) : CardT
 {
     switch(action.type)
     {
-        case CardTableActionType.SetCandidates:
-            return {...state, table:[action.candidates,action.choices]}
+        case CardTableActionType.SetCards:
+            return {...state, table:action.cards}
         case CardTableActionType.AddCard:
             const total = state.table.map(value => value.length).reduce((previous, current) => previous + current)
 
