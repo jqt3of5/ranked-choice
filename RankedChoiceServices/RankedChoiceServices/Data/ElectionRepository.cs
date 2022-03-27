@@ -1,15 +1,19 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace RankedChoiceServices.Data
 {
     public record Candidate(string electionId, string candidateId, string value);
+
+    public record Election(string electionId, IEnumerable<Candidate> candidates);
+    
     public class ElectionRepository
     {
-        private Dictionary<string, IEnumerable<Candidate>> _elections = new();
+        private Dictionary<string, Election> _elections = new();
         
-        public void SaveElection(string electionId, IEnumerable<Candidate> candidates)
+        public void SaveElection(string electionId, Election election)
         {
-            _elections[electionId] = candidates;
+            _elections[electionId] = election;
         }
 
         public bool ElectionExists(string electionId)
@@ -17,9 +21,14 @@ namespace RankedChoiceServices.Data
             return _elections.ContainsKey(electionId);
         }
         
-        public IEnumerable<Candidate> GetElection(string electionId)
+        public Election? GetElection(string electionId)
         {
-            return _elections[electionId];
+            if (_elections.TryGetValue(electionId, out var election))
+            {
+                return election;
+            }
+
+            return null;
         }
     }
 }

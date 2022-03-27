@@ -1,0 +1,21 @@
+.landing-page {
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+}
+.landing-box {
+    height: 200px;
+    width: 500px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+}
+.landing-box h2 {
+    margin-top:4px;
+}
+.landing-box a {
+    margin: 16px;
+}

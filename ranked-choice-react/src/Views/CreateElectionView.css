@@ -18,3 +18,10 @@
     align-items: start;
     justify-content: center;
 }
+
+.create-election-share {
+   display:flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 12px;
+}

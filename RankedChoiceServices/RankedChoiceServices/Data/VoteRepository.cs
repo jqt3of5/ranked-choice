@@ -14,10 +14,14 @@ namespace RankedChoiceServices.Data
     public class VoteRepository
     {
         private Dictionary<(string, string), UserVote> _userVotes = new ();
-        
-        public void SaveUserVote(string userId, string electionId, IEnumerable<Candidate> rankedChoices)
+
+        public bool UserVoteSubmitted(string userId, string electionId)
         {
-            _userVotes[(userId, electionId)] = new UserVote(electionId, userId, rankedChoices.ToArray());
+            return GetVote(userId, electionId)?.submitted ?? false;
+        }
+        public void SaveUserVote(string userId, string electionId, UserVote vote)
+        {
+            _userVotes[(userId, electionId)] = vote;
         }
 
         public void SubmitVote(string userId, string electionId)
@@ -27,6 +31,10 @@ namespace RankedChoiceServices.Data
 
         public UserVote GetVote(string userId, string electionId)
         {
+            if (!_userVotes.ContainsKey((userId, electionId)))
+            {
+                _userVotes[(userId, electionId)] = new UserVote(electionId, userId, new Candidate[] { });
+            }
             return _userVotes[(userId, electionId)];
         }
         

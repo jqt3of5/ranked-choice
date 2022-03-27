@@ -1,5 +1,6 @@
-import React, {useRef, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import './Card.css'
+import '../Common/common.css'
 import {useDrag, useDrop} from "react-dnd";
 import {MdDeleteOutline} from "react-icons/md";
 import {CardTableAction, CardTableActionType, CardTableState} from "../Views/CardTableReducer";
@@ -35,7 +36,7 @@ export interface DragItem {
 
 export function Card(props : CardProps) {
 
-    const [{editing}, setState] = useState({editing: false})
+    const [{editing, text}, setState] = useState({editing: false, text: ""})
 
     const ref = useRef<HTMLDivElement>(null)
 
@@ -69,19 +70,31 @@ export function Card(props : CardProps) {
         // canDrop: (item, monitor) => !props.canReorder
     }, [props.index, props.column])
 
+    useEffect(() => {
+        if (ref.current) {
+            ref.current.setAttribute('draggable', String(!editing));
+        }
+    }, [editing]);
+
     drag(drop(ref))
     return <div ref={ref} className={"card"} style={{opacity: isOver? 0.5 : 1}}>
 
-        {props.canEdit && !editing && <label onDoubleClick={event => setState({editing: true})}>{props.card.text}</label>}
-        {props.canEdit && editing && <textarea onBlur={event => {
+        {!props.canEdit && <label>{props.card.text}</label>}
+        {props.canEdit && !editing && <label onDoubleClick={event => setState({text:props.card.text, editing: true})}>{props.card.text}</label>}
+
+        {editing && <div className={"masked-background"} onClick={event => {
+            props.dispatch({type:CardTableActionType.EditCard, card:{...props.card, text:text}, index: props.index, column: props.column})
+            setState({text: text, editing: false})
+        }}></div>}
+        {editing && <textarea onBlur={event => {
 
             props.dispatch({type:CardTableActionType.EditCard, card:{...props.card, text:event.target.value}, index: props.index, column: props.column})
-            setState({editing: false})
+            // setState({text: text, editing: false})
 
-            }}  defaultValue={props.card.text}/>
+            }}  value={text}/>
         }
 
-        {!props.canEdit && <label>{props.card.text}</label>}
+
 
         {props.canEdit && <MdDeleteOutline onClick={event => {
             props.dispatch({type:CardTableActionType.DeleteCard, index: props.index, column: props.column})

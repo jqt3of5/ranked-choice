@@ -1,6 +1,7 @@
 import React, {useRef} from 'react';
 import {Card, CardData, DragItem, ItemTypes} from './Card'
 import "./Column.css"
+import "../Common/common.css"
 import {useDrag, useDrop} from "react-dnd";
 import {CardTableAction, CardTableActionType, CardTableState} from "../Views/CardTableReducer";
 import {IoAdd} from "react-icons/io5";
@@ -37,7 +38,7 @@ export function Column(props : ColumnProps) {
         canDrop: (item, monitor) => props.canReorder
     }, [props.column, props.cards])
 
-    return <div ref={drop} className={"column"}>
+    return <div ref={drop} className={"column box"}>
         <div className={"column-header"}>
             <label>{props.name}</label>
         </div>

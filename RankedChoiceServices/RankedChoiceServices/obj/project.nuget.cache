@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "a1GyoJY/v34sQuaTR6+zrXGnYO7Jb322Qh+ugaRSlj9q10rS4cpwVby5fbNHrhbPuPAuoQNyzf9GJNJ6IqnpUg==",
+  "dgSpecHash": "14xEYqevfDgRp67nKesFLmwwTMpWe75JXrcK5f+tKLtmMiEYPkYQGn7m+qCFuaIgcGy1wiIzo4KKV3XB7QMFaw==",
   "success": true,
-  "projectFilePath": "C:\\Users\\jqt3o\\WebstormProjects\\craft-closet-preview\\aspnet\\RankedChoiceServices\\RankedChoiceServices\\RankedChoiceServices.csproj",
+  "projectFilePath": "C:\\Users\\jqt3o\\sd\\ranked-choice\\RankedChoiceServices\\RankedChoiceServices\\RankedChoiceServices.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\jqt3o\\.nuget\\packages\\microsoft.extensions.apidescription.server\\3.0.0\\microsoft.extensions.apidescription.server.3.0.0.nupkg.sha512",
     "C:\\Users\\jqt3o\\.nuget\\packages\\microsoft.openapi\\1.2.3\\microsoft.openapi.1.2.3.nupkg.sha512",

@@ -22,20 +22,33 @@ namespace RankedChoiceServices.Controllers
         }
 
         [HttpGet("{electionId}")]
-        public IEnumerable<Candidate> GetElection(string electionId)
+        public Election GetElection(string electionId)
         {
             if (_repo.ElectionExists(electionId))
             {
                 return _repo.GetElection(electionId);
             }
 
-            return Array.Empty<Candidate>();
+            return null;
         }
         
         [HttpPost("{electionId}")]
-        public bool SaveElection(string electionId, [FromBody] Candidate[] candidates)
+        public bool SaveElection(string electionId, [FromBody] Election election)
         {
-            _repo.SaveElection(electionId,candidates);
+            if (electionId != election.electionId)
+            {
+                _logger.Log(LogLevel.Error, "ElectionId mismatch {electionId} {election.electionId}", electionId, election.electionId);
+                HttpContext.Response.StatusCode = 400;
+                return false;
+            }
+
+            if (!_repo.ElectionExists(electionId))
+            {
+                _logger.Log(LogLevel.Information, "New election created with Id {electionId}", electionId);
+            }
+            
+            _logger.Log(LogLevel.Information, "Election with Id {electionId} Saved", electionId);
+            _repo.SaveElection(electionId,election);
             return true;
         }
       

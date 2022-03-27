@@ -1,24 +1,25 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\jqt3o\\WebstormProjects\\craft-closet-preview\\aspnet\\RankedChoiceServices\\RankedChoiceServices\\RankedChoiceServices.csproj": {}
+    "C:\\Users\\jqt3o\\sd\\ranked-choice\\RankedChoiceServices\\RankedChoiceServices\\RankedChoiceServices.csproj": {}
   },
   "projects": {
-    "C:\\Users\\jqt3o\\WebstormProjects\\craft-closet-preview\\aspnet\\RankedChoiceServices\\RankedChoiceServices\\RankedChoiceServices.csproj": {
+    "C:\\Users\\jqt3o\\sd\\ranked-choice\\RankedChoiceServices\\RankedChoiceServices\\RankedChoiceServices.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\jqt3o\\WebstormProjects\\craft-closet-preview\\aspnet\\RankedChoiceServices\\RankedChoiceServices\\RankedChoiceServices.csproj",
+        "projectUniqueName": "C:\\Users\\jqt3o\\sd\\ranked-choice\\RankedChoiceServices\\RankedChoiceServices\\RankedChoiceServices.csproj",
         "projectName": "RankedChoiceServices",
-        "projectPath": "C:\\Users\\jqt3o\\WebstormProjects\\craft-closet-preview\\aspnet\\RankedChoiceServices\\RankedChoiceServices\\RankedChoiceServices.csproj",
+        "projectPath": "C:\\Users\\jqt3o\\sd\\ranked-choice\\RankedChoiceServices\\RankedChoiceServices\\RankedChoiceServices.csproj",
         "packagesPath": "C:\\Users\\jqt3o\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\jqt3o\\WebstormProjects\\craft-closet-preview\\aspnet\\RankedChoiceServices\\RankedChoiceServices\\obj\\",
+        "outputPath": "C:\\Users\\jqt3o\\sd\\ranked-choice\\RankedChoiceServices\\RankedChoiceServices\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
-          "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
+          "C:\\Microsoft\\Xamarin\\NuGet"
         ],
         "configFilePaths": [
           "C:\\Users\\jqt3o\\AppData\\Roaming\\NuGet\\NuGet.Config",
-          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Xamarin.Offline.config"
         ],
         "originalTargetFrameworks": [
           "net5.0"
@@ -66,7 +67,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\5.0.300\\RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\5.0.104\\RuntimeIdentifierGraph.json"
         }
       }
     }

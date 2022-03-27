@@ -17,7 +17,7 @@ export type CardTableAction =
     | {type: CardTableActionType.EditCard, card:CardData, index: number, column: number}
     | {type: CardTableActionType.MoveCard, sourceIndex: number, sourceColumn: number, destIndex : number, destColumn: number}
 
-export function reduce(state : CardTableState, action : CardTableAction) : CardTableState
+export function card_table_reducer(state : CardTableState, action : CardTableAction) : CardTableState
 {
     switch(action.type)
     {
@@ -29,7 +29,7 @@ export function reduce(state : CardTableState, action : CardTableAction) : CardT
             return {...state, table: state.table.map((column, col) => {
                         if (col === action.column)
                         {
-                            return column.concat({text:"New Card", id:"card"+total})
+                            return column.concat({text:"Card " + total, id:"card"+total})
                         }
                         return column
                     }

@@ -1,0 +1,15 @@
+.box{
+    margin: 8px;
+    padding: 8px;
+    background-color: aliceblue;
+    border-radius: 8px;
+    width: 400px;
+    box-shadow: darkgray 4px 4px 4px 4px;
+}
+.masked-background {
+    background-color: black;
+    opacity: .5;
+    position: fixed;
+    width: 100vw;
+    height: 100vh;
+}

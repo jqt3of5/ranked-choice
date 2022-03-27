@@ -3,52 +3,50 @@ import {Column} from '../Components/Column';
 import './CreateElectionView.css'
 import { DndProvider } from 'react-dnd';
 import {HTML5Backend} from "react-dnd-html5-backend";
-import {CardTableActionType, reduce} from "./CardTableReducer";
-import {Candidate} from "../Common/Data";
+import {CardTableActionType, card_table_reducer} from "./CardTableReducer";
+import {Candidate, Election} from "../Common/Data";
 import {CardData} from "../Components/Card";
-
-function getCandidates(electionId : string) : Promise<CardData[]>
-{
-    return fetch(`https://localhost:5001/election/${electionId}`)
-        .then(res => res.json().then(v => v as Candidate[]))
-        .then(
-            (result) => {
-                //convert to cardData
-                let cards = result.map(c => {return {id:c.candidateId, text: c.value}})
-                return cards
-            },
-            (error) => {
-                return []
-            }
-        )
-}
-
-function saveCandidates(electionId : string, cardData: CardData [])
-{
-    let candidates : Candidate[] = cardData.map(value => {return {electionId: electionId, candidateId: value.id, value: value.text}})
-    fetch(`https://localhost:5001/election/${electionId}`,
-        {method: "POST", headers:{"Content-Type":"application/json"},
-            body:JSON.stringify(candidates)})
-}
+import {getElection, saveCandidates} from "../Common/ElectionModel";
+import {useCookies} from "react-cookie";
+import {v4} from "uuid";
+import {useParams} from "react-router-dom";
+import {BiDuplicate} from "react-icons/bi";
 
 export function CreateElectionView() {
-    var [state, dispatch] = useReducer(reduce, {
+    var [state, dispatch] = useReducer(card_table_reducer, {
         table: [[],[]]
     })
 
-    var electionId = "12345"
+    const [cookies, setCookie] = useCookies(['userId'])
+    if (cookies.userId===undefined)
+    {
+        setCookie('userId', v4())
+    }
+
+    let params = useParams();
+    if (params.electionId===undefined)
+    {
+        throw "electionID cannot be undefined"
+    }
+    let electionId = params.electionId as string
 
     useEffect(() => {
-        getCandidates(electionId).then((cards => {
-            dispatch({type: CardTableActionType.SetCards, cards: [cards]})
+        getElection(electionId, cookies.userId).then((election => {
+            let candidateCardData = election.candidates.map(c => {return {id:c.candidateId, text: c.value}})
+
+            dispatch({type:CardTableActionType.SetCards, cards: [candidateCardData]})
         }))
-    })
+    },[electionId])
 
-    //TODO: Generate a cookie for ourselves
-    //TODO: Get candidate list, and ranked list from server based on cookie
-    //TODO: handle submit
-    //TODO: Make lists readonly if previously posted
+    useEffect(() => {
+        //Seems to be really chatty. Probably should diff and check
+        let candidates : Candidate[] = state.table[0].map(value => {return {electionId: electionId, candidateId: value.id, value: value.text}})
+        saveCandidates(electionId, cookies.userId, candidates)
+    }, [state.table])
 
+    //TODO: Deleting then adding cards will mess up the card ids
+
+    let electionUrl = `http://localhost:3000/vote/${electionId}`
     return <div className={"create-election-view"}>
 
         <DndProvider backend={HTML5Backend}>
@@ -61,11 +59,9 @@ export function CreateElectionView() {
             </div>
         </DndProvider>
 
-        <div className={"box"}>
-            <button onClick={event => {
-                saveCandidates(electionId, state.table[0])
-            }}>Save</button>
-
+        <div className={"box create-election-share"}>
+            <a href={electionUrl}>{electionUrl}</a>
+            <BiDuplicate/>
         </div>
     </div>
 }
