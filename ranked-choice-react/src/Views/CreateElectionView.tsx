@@ -1,6 +1,7 @@
 import React, {useEffect, useReducer, useState} from 'react';
 import {Column} from '../Components/Column';
 import './CreateElectionView.css'
+import '../Common/common.css'
 import { DndProvider } from 'react-dnd';
 import {HTML5Backend} from "react-dnd-html5-backend";
 import {CardTableActionType, card_table_reducer} from "./CardTableReducer";
@@ -49,19 +50,31 @@ export function CreateElectionView() {
     let electionUrl = `http://localhost:3000/vote/${electionId}`
     return <div className={"create-election-view"}>
 
+        <div className={"create-election-view-settings"}>
+
+        </div>
+
         <DndProvider backend={HTML5Backend}>
             <div className={"create-election-view-table"}>
-                <Column name={"Add your possible Selections"} column={0}
-                        canReorder={true} canEdit={true}
-                        showRank={false} cards={state.table[0]}
-                        dispatch={dispatch}
-                />
+                <div className={"create-election-view-table-column"}>
+                    <Column name={"Add your possible Selections"} column={0}
+                            canReorder={true} canEdit={true}
+                            showRank={false} cards={state.table[0]}
+                            dispatch={dispatch}
+                    />
+
+                    <div className={"box create-election-share"}>
+                        <a href={electionUrl}>{electionUrl}</a>
+                        <BiDuplicate/>
+                    </div>
+
+                </div>
             </div>
         </DndProvider>
 
-        <div className={"box create-election-share"}>
-            <a href={electionUrl}>{electionUrl}</a>
-            <BiDuplicate/>
+        <div className={"create-election-view-trail"}>
+
         </div>
+
     </div>
 }

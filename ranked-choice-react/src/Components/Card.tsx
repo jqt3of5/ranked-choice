@@ -82,10 +82,10 @@ export function Card(props : CardProps) {
         {!props.canEdit && <label>{props.card.text}</label>}
         {props.canEdit && !editing && <label onDoubleClick={event => setState({text:props.card.text, editing: true})}>{props.card.text}</label>}
 
-        {editing && <div className={"masked-background"} onClick={event => {
-            props.dispatch({type:CardTableActionType.EditCard, card:{...props.card, text:text}, index: props.index, column: props.column})
-            setState({text: text, editing: false})
-        }}></div>}
+        {/*{editing && <div className={"masked-background"} onClick={event => {*/}
+        {/*    props.dispatch({type:CardTableActionType.EditCard, card:{...props.card, text:text}, index: props.index, column: props.column})*/}
+        {/*    setState({text: text, editing: false})*/}
+        {/*}}></div>}*/}
         {editing && <textarea onBlur={event => {
 
             props.dispatch({type:CardTableActionType.EditCard, card:{...props.card, text:event.target.value}, index: props.index, column: props.column})
@@ -93,8 +93,6 @@ export function Card(props : CardProps) {
 
             }}  value={text}/>
         }
-
-
 
         {props.canEdit && <MdDeleteOutline onClick={event => {
             props.dispatch({type:CardTableActionType.DeleteCard, index: props.index, column: props.column})
