@@ -17,6 +17,17 @@ export type CardTableAction =
     | {type: CardTableActionType.EditCard, card:CardData, index: number, column: number}
     | {type: CardTableActionType.MoveCard, sourceIndex: number, sourceColumn: number, destIndex : number, destColumn: number}
 
+function shortId(length : number = 8) : string
+{
+    const chars = "abcdefghijklmnopqrstubvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+    let result = ""
+    for (let i = 0; i < length; ++i)
+    {
+       result += chars[Math.floor(Math.random()*chars.length)]
+    }
+
+    return result
+}
 export function card_table_reducer(state : CardTableState, action : CardTableAction) : CardTableState
 {
     switch(action.type)
@@ -29,7 +40,7 @@ export function card_table_reducer(state : CardTableState, action : CardTableAct
             return {...state, table: state.table.map((column, col) => {
                         if (col === action.column)
                         {
-                            return column.concat({text:"Card " + total, id:"card"+total})
+                            return column.concat({text:"Card " + total, id:shortId()})
                         }
                         return column
                     }

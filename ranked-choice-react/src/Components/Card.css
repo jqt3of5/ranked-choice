@@ -13,4 +13,6 @@
 }
 .card textarea {
     flex-grow: 1;
+    /*the idea is that there will be a masked background, and we want this on top */
+    z-index: 10;
 }

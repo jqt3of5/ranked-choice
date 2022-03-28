@@ -1,5 +1,9 @@
-.column {
+.card-table-column {
+    display:flex;
+    flex-direction: column;
+    flex-grow: 1;
 }
+
 .column-header {
     display: flex;
     margin: 8px;

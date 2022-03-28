@@ -39,6 +39,7 @@ export function Card(props : CardProps) {
     const [{editing, text}, setState] = useState({editing: false, text: ""})
 
     const ref = useRef<HTMLDivElement>(null)
+    const textArea = useRef<HTMLTextAreaElement>(null)
 
     const [{isDragging}, drag] = useDrag({
         type: ItemTypes.CARD,
@@ -74,6 +75,10 @@ export function Card(props : CardProps) {
         if (ref.current) {
             ref.current.setAttribute('draggable', String(!editing));
         }
+        if (textArea.current && editing){
+            textArea.current.focus()
+            textArea.current.select()
+        }
     }, [editing]);
 
     drag(drop(ref))
@@ -82,17 +87,12 @@ export function Card(props : CardProps) {
         {!props.canEdit && <label>{props.card.text}</label>}
         {props.canEdit && !editing && <label onDoubleClick={event => setState({text:props.card.text, editing: true})}>{props.card.text}</label>}
 
-        {/*{editing && <div className={"masked-background"} onClick={event => {*/}
-        {/*    props.dispatch({type:CardTableActionType.EditCard, card:{...props.card, text:text}, index: props.index, column: props.column})*/}
-        {/*    setState({text: text, editing: false})*/}
-        {/*}}></div>}*/}
-        {editing && <textarea onBlur={event => {
+        {editing && <div className={"masked-background"} onClick={event => {
+            props.dispatch({type:CardTableActionType.EditCard, card:{...props.card, text:text}, index: props.index, column: props.column})
+            setState({text: text, editing: false})
+        }}/>}
 
-            props.dispatch({type:CardTableActionType.EditCard, card:{...props.card, text:event.target.value}, index: props.index, column: props.column})
-            // setState({text: text, editing: false})
-
-            }}  value={text}/>
-        }
+        {editing && <textarea ref={textArea} value={text} onChange={event => setState(state => {return {...state, text: event.target.value}})}/>}
 
         {props.canEdit && <MdDeleteOutline onClick={event => {
             props.dispatch({type:CardTableActionType.DeleteCard, index: props.index, column: props.column})

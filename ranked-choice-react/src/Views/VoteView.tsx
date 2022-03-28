@@ -86,24 +86,24 @@ export function VoteView() {
     return <div className={"vote-view"}>
         <DndProvider backend={HTML5Backend}>
             <div className={"vote-view-table"}>
-                <Column key={"candidates"}  name={"Candidates"} column={0}
-                        canReorder={!isReadOnly} canEdit={false}
-                        showRank={false} cards={tableState.table[0]}
-                        dispatch={dispatch}/>
-                <div>
-                    <Column key={"ranked_choice"} name={"Ranked Choice"} column={1}
-                            canReorder={!isReadOnly} canEdit={false}
-                            showRank={true} cards={tableState.table[1]}
-                            dispatch={dispatch}/>
-                    <div className={"box"}>
-                        <button onClick={event => {
-                            submitVote(electionId, cookies.userId, choices)
-                            setState(state => {
-                                return {...state, isReadOnly:true}
-                            })
-                        }}>Submit</button>
-                    </div>
-                </div>
+                {/*<Column key={"candidates"}  name={"Candidates"} column={0}*/}
+                {/*        canReorder={!isReadOnly} canEdit={false}*/}
+                {/*        showRank={false} cards={tableState.table[0]}*/}
+                {/*        dispatch={dispatch}/>*/}
+                {/*<div>*/}
+                {/*    <Column key={"ranked_choice"} name={"Ranked Choice"} column={1}*/}
+                {/*            canReorder={!isReadOnly} canEdit={false}*/}
+                {/*            showRank={true} cards={tableState.table[1]}*/}
+                {/*            dispatch={dispatch}/>*/}
+                {/*    <div className={"box"}>*/}
+                {/*        <button onClick={event => {*/}
+                {/*            submitVote(electionId, cookies.userId, choices)*/}
+                {/*            setState(state => {*/}
+                {/*                return {...state, isReadOnly:true}*/}
+                {/*            })*/}
+                {/*        }}>Submit</button>*/}
+                {/*    </div>*/}
+                {/*</div>*/}
             </div>
 
         </DndProvider>

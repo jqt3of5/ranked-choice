@@ -6,12 +6,13 @@ import { DndProvider } from 'react-dnd';
 import {HTML5Backend} from "react-dnd-html5-backend";
 import {CardTableActionType, card_table_reducer} from "./CardTableReducer";
 import {Candidate, Election} from "../Common/Data";
-import {CardData} from "../Components/Card";
+import {Card, CardData} from "../Components/Card";
 import {getElection, saveCandidates} from "../Common/ElectionModel";
 import {useCookies} from "react-cookie";
 import {v4} from "uuid";
 import {useParams} from "react-router-dom";
 import {BiDuplicate} from "react-icons/bi";
+import {CardTable} from "../Components/Table";
 
 export function CreateElectionView() {
     var [state, dispatch] = useReducer(card_table_reducer, {
@@ -50,31 +51,32 @@ export function CreateElectionView() {
     let electionUrl = `http://localhost:3000/vote/${electionId}`
     return <div className={"create-election-view"}>
 
-        <div className={"create-election-view-settings"}>
+        <div className={"create-election-view-settings"}></div>
 
-        </div>
+        <CardTable>
+            <div>
+                <Column name={"Add your possible Selections"} column={0}
+                        canReorder={true} canEdit={true}
+                        showRank={false}
+                        dispatch={dispatch}>
 
-        <DndProvider backend={HTML5Backend}>
-            <div className={"create-election-view-table"}>
-                <div className={"create-election-view-table-column"}>
-                    <Column name={"Add your possible Selections"} column={0}
-                            canReorder={true} canEdit={true}
-                            showRank={false} cards={state.table[0]}
-                            dispatch={dispatch}
-                    />
+                    {state.table[0].map((card, index) => {
+                        return <Card key={"card" + card.id} card={card}
+                                     index={index} column={0}
+                                     canEdit={true} canReorder={true}
+                                     showRank={false}
+                                     dispatch={dispatch}/>
+                    })}
 
-                    <div className={"box create-election-share"}>
-                        <a href={electionUrl}>{electionUrl}</a>
-                        <BiDuplicate/>
-                    </div>
-
+                </Column>
+                <div className={"box create-election-share"}>
+                    <a href={electionUrl}>{electionUrl}</a>
+                    <BiDuplicate/>
                 </div>
             </div>
-        </DndProvider>
 
-        <div className={"create-election-view-trail"}>
+        </CardTable>
 
-        </div>
-
+        <div className={"create-election-view-trail"}/>
     </div>
 }
