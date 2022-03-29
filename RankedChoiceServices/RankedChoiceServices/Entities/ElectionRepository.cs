@@ -5,23 +5,25 @@ namespace RankedChoiceServices.Data
 {
     public record Candidate(string electionId, string candidateId, string value);
 
-    public record Election(string electionId, IEnumerable<Candidate> candidates);
+    public record ElectionSettings(string electionId, string []voterEmails, bool uniqueUrl, string[] uniqueElectionIds);
+    public enum ElectionState {New, Started, Finished}
+    public record Election(string electionId, ElectionState state, ElectionSettings settings,  IEnumerable<Candidate> candidates);
     
     public class ElectionRepository
     {
         private Dictionary<string, Election> _elections = new();
         
-        public void SaveElection(string electionId, Election election)
+        public void Save(string electionId, Election election)
         {
             _elections[electionId] = election;
         }
 
-        public bool ElectionExists(string electionId)
+        public bool Exists(string electionId)
         {
             return _elections.ContainsKey(electionId);
         }
         
-        public Election? GetElection(string electionId)
+        public Election? Get(string electionId)
         {
             if (_elections.TryGetValue(electionId, out var election))
             {

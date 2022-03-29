@@ -24,9 +24,9 @@ namespace RankedChoiceServices.Controllers
         [HttpGet("{electionId}")]
         public Election GetElection(string electionId)
         {
-            if (_repo.ElectionExists(electionId))
+            if (_repo.Exists(electionId))
             {
-                return _repo.GetElection(electionId);
+                return _repo.Get(electionId);
             }
 
             return null;
@@ -42,13 +42,13 @@ namespace RankedChoiceServices.Controllers
                 return false;
             }
 
-            if (!_repo.ElectionExists(electionId))
+            if (!_repo.Exists(electionId))
             {
                 _logger.Log(LogLevel.Information, "New election created with Id {electionId}", electionId);
             }
             
             _logger.Log(LogLevel.Information, "Election with Id {electionId} Saved", electionId);
-            _repo.SaveElection(electionId,election);
+            _repo.Save(electionId, election);
             return true;
         }
       

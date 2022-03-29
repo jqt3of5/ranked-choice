@@ -44,7 +44,7 @@ namespace RankedChoiceServices.Controllers
             //This endpoint cannot be used to submit a vote
             vote.submitted = false;
             
-            if (_electionRepository.GetElection(electionId) is {} election)
+            if (_electionRepository.Get(electionId) is {} election)
             {
                 //We want to add a little security, this prevents users from sending invalid candidates. 
                 var candidates = vote.choices 
