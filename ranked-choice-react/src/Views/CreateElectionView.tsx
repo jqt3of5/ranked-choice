@@ -55,7 +55,7 @@ export function CreateElectionView() {
 
         <CardTable>
             <div>
-                <Column name={"Add your possible Selections"} column={0}
+                <Column name={"Add your candidates"} column={0}
                         canReorder={true} canEdit={true}
                         showRank={false}
                         dispatch={dispatch}>
@@ -70,8 +70,11 @@ export function CreateElectionView() {
 
                 </Column>
                 <div className={"box create-election-share"}>
-                    <a href={electionUrl}>{electionUrl}</a>
-                    <BiDuplicate/>
+                    <div>
+                        <a href={electionUrl}>{electionUrl}</a>
+                        <BiDuplicate/>
+                    </div>
+                    <button>Start</button>
                 </div>
             </div>
 

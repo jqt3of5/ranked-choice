@@ -1,5 +1,6 @@
 .card{
-    margin:4px;
+    margin-top:6px;
+    margin-bottom:6px;
     padding:8px;
     padding-left: 12px;
     border-radius: 2px;
@@ -7,6 +8,20 @@
     box-shadow: lightgrey 2px 2px 2px 2px;
     display:flex;
     flex-grow: 1;
+}
+
+.card-delete {
+    width:24px;
+    height:24px;
+    border-radius: 4px;
+}
+
+.card-delete:hover {
+    background: lightgrey;
+}
+
+.card-delete:active{
+    background: darkgray;
 }
 .card label {
     flex-grow: 1;

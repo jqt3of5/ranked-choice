@@ -94,7 +94,7 @@ export function Card(props : CardProps) {
 
         {editing && <textarea ref={textArea} value={text} onChange={event => setState(state => {return {...state, text: event.target.value}})}/>}
 
-        {props.canEdit && <MdDeleteOutline onClick={event => {
+        {props.canEdit && <MdDeleteOutline className={"card-delete"} onClick={event => {
             props.dispatch({type:CardTableActionType.DeleteCard, index: props.index, column: props.column})
         }}/>}
     </div>
