@@ -1,21 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
-namespace RankedChoiceServices.Data
+namespace RankedChoiceServices.Entities
 {
-    public record Candidate(string electionId, string candidateId, string value);
-
-    public record ElectionSettings(string electionId, string []voterEmails, bool uniqueUrl, string[] uniqueElectionIds);
-    public enum ElectionState {New, Started, Finished}
-    public record Election(string electionId, ElectionState state, ElectionSettings settings,  IEnumerable<Candidate> candidates);
-    
     public class ElectionRepository
     {
-        private Dictionary<string, Election> _elections = new();
+        private Dictionary<string, ElectionEntity> _elections = new();
         
-        public void Save(string electionId, Election election)
+        public void Save(string electionId, IElection election)
         {
-            _elections[electionId] = election;
+            //TODO: We shouldn't make this assumption. But there is a lot more work to be done here any way
+            _elections[electionId] = election as ElectionEntity;
         }
 
         public bool Exists(string electionId)
@@ -23,14 +17,14 @@ namespace RankedChoiceServices.Data
             return _elections.ContainsKey(electionId);
         }
         
-        public Election? Get(string electionId)
+        public IElection Get(string electionId)
         {
-            if (_elections.TryGetValue(electionId, out var election))
+            if (!_elections.TryGetValue(electionId, out var election))
             {
-                return election;
+                election = new ElectionEntity(electionId);
+                _elections[electionId] = election;
             }
-
-            return null;
+            return election;
         }
     }
 }

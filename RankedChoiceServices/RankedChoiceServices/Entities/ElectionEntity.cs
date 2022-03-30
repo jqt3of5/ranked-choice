@@ -9,23 +9,62 @@ namespace RankedChoiceServices.Entities
 
     public record User(string email, string userId);
 
-    public record Vote(string userId, Candidate [] candidates); 
+    public record Vote(string userId, Candidate [] candidates);
+
+    public interface IElection
+    {
+        //TODO: Doesn't include metadata, like dates, and users, etc. 
+        public IReadOnlyList<IReadOnlyList<Candidate>> History { get; }
+        public IReadOnlyList<Candidate> Candidates { get; set;  }
+        public IReadOnlyList<User> Users { get; }
+        public IReadOnlyList<Vote> Votes { get; }
+        public IEnumerable<string> UniqueElectionIds { get; }
+        public bool UniqueIdsPerUser { get; set; }
+        
+        public enum ElectionState
+        {
+            New, Started, Finished
+        }
+        public ElectionState State { get; }
+
+        public bool StartElection();
+        public bool StopElection();
+        public bool RestartElection();
+        
+        public bool SetUserEmails(string[] emails);
+        public IEnumerable<Candidate> CalculateResults();
+    }
     
-    public class ElectionEntity
+    public class ElectionEntity : IElection
     {
         private string ElectionId
         {
             get;
         }
 
+        private List<IReadOnlyList<Candidate>> _history = new();
+        public IReadOnlyList<IReadOnlyList<Candidate>> History => _history; 
+        
         private List<Candidate> _candidates = new();
-        public IReadOnlyList<Candidate> Candidates => _candidates;
+        public IReadOnlyList<Candidate> Candidates
+        {
+            get => _candidates;
+            set
+            {
+                if (State != IElection.ElectionState.New)
+                {
+                    return;
+                }
+                _candidates.Clear(); 
+                _candidates.AddRange(value);
+            }
+        }
 
         private List<Vote> _votes = new();
         public IReadOnlyList<Vote> Votes => _votes;
 
         private List<User> _users = new();
-        private IReadOnlyList<User> Users => _users;
+        public IReadOnlyList<User> Users => _users;
 
         public IEnumerable<string> UniqueElectionIds =>
             UniqueIdsPerUser ? Users.Select(u => u.userId) : new List<string>();
@@ -35,12 +74,7 @@ namespace RankedChoiceServices.Entities
             get; set;
         }
 
-        public enum ElectionState
-        {
-            New, Started, Finished
-        }
-
-        public ElectionState State
+        public IElection.ElectionState State
         {
             get;
             private set;
@@ -52,40 +86,74 @@ namespace RankedChoiceServices.Entities
             UniqueIdsPerUser = false;
         }
 
-
-        public void StartElection()
+        public bool StartElection()
         {
-            State = ElectionState.Started;
-        }
-
-        public void StopElection()
-        {
-            State = ElectionState.Finished;
-        }
-
-        public bool AddUser(string email)
-        {
-            //Can't add users to a finished election
-            if (State == ElectionState.Finished)
+            switch (State)
             {
-                return false;
+                case IElection.ElectionState.New:
+                    State = IElection.ElectionState.Started;
+                    return true;
+                case IElection.ElectionState.Started:
+                case IElection.ElectionState.Finished:
+                    return false;
             }
-            //Don't readd theuser twice
-            if (_users.Any(u => u.email == email))
+
+            return false;
+        }
+
+        public bool StopElection()
+        {
+            switch (State)
             {
-                return false;
+                case IElection.ElectionState.New:
+                    return false;
+                case IElection.ElectionState.Started:
+                    State = IElection.ElectionState.Finished;
+                    return true;
+                case IElection.ElectionState.Finished:
+                    return false;
+            }
+
+            return false;
+        }
+        
+        public bool RestartElection()
+        {
+            switch (State)
+            {
+                case IElection.ElectionState.New:
+                case IElection.ElectionState.Started:
+                    return false;
+                case IElection.ElectionState.Finished:
+                    State = IElection.ElectionState.Started;
+                    return true;
             }
             
-            var user = new User(email, new Guid().ToString());
+            _history.Add(CalculateResults().ToList());
+            _votes.Clear();
 
-            _users.Add(user);
+            return false;
+        }
+
+        public bool SetUserEmails(string[] emails)
+        {
+            //Can't add users to a finished election
+            if (State == IElection.ElectionState.Finished)
+            {
+                return false;
+            }
+            _users.Clear();
+            
+            var users = emails.Select(e => new User(e, new Guid().ToString()));
+            _users.AddRange(users);
+            
             return true;
         }
 
         public bool AddVote(Vote vote)
         {
             //Finished and New elections can't have votes added to them
-            if (State != ElectionState.Started)
+            if (State != IElection.ElectionState.Started)
             {
                 return false;
             }
@@ -97,47 +165,11 @@ namespace RankedChoiceServices.Entities
             _votes.Add(vote);
             return true;
         }
-
-        public bool SetCandidates(Candidate[] candidates)
-        {
-            if (State != ElectionState.New)
-            {
-                return false;
-            }
-            
-            _candidates.Clear();
-            _candidates.AddRange(candidates);
-            return true;
-        }
         
         public IEnumerable<Candidate> CalculateResults()
         {
-            Dictionary<string, int> candidateCounts = new Dictionary<string, int>();
-            foreach (var candidate in _candidates)
-            {
-                candidateCounts[candidate.candidateId] = 0;
-            }
-            
-            for (int i = 0; i < _candidates.Count; ++i)
-            {
-                foreach (var vote in _votes)
-                {
-                    //Voters don't have to vote for all candidates
-                    if (i >= vote.candidates.Length)
-                    {
-                        continue;
-                    }
-                }
-                
-                //Any have a majority?
-                foreach (var candidateCount in candidateCounts)
-                {
-                    if (candidateCount.Value > _candidates.Count / 2)
-                    {
-                        
-                    }
-                }
-            }
+            //TODO: Do this 
+            return _candidates;
         }
     }
 }

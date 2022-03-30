@@ -1,10 +1,6 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using System.Net.Http;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using RankedChoiceServices.Data;
+using RankedChoiceServices.Entities;
 
 namespace RankedChoiceServices.Controllers
 {
@@ -14,13 +10,11 @@ namespace RankedChoiceServices.Controllers
     {
         private readonly ILogger<VoteController> _logger;
         private readonly ElectionRepository _electionRepository;
-        private readonly VoteRepository _voteRepository;
 
-        public VoteController(ILogger<VoteController> logger, ElectionRepository electionRepository, VoteRepository voteRepository)
+        public VoteController(ILogger<VoteController> logger, ElectionRepository electionRepository)
         {
             _logger = logger;
             _electionRepository = electionRepository;
-            _voteRepository = voteRepository;
         }
         
         [HttpPost("{electionId}")]
