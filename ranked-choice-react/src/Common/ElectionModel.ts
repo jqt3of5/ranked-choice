@@ -1,42 +1,46 @@
 import {CardData} from "../Components/Card";
-import {Candidate, Election, UserVote} from "./Data";
+import {CandidateDTO, ElectionDTO, ElectionSettingsDTO, VoteDTO} from "./Data";
 
-export function getElection(electionId : string, userId : string) : Promise<Election>
+export function getElectionCandidates(electionId : string, userId : string) : Promise<ElectionDTO>
 {
-    return fetch(`https://localhost:5001/election/${electionId}`)
-        .then(res => res.json().then(res => res as Election))
+    return fetch(`https://localhost:5001/election/${electionId}/candidates`)
+        .then(res => res.json().then(res => res as ElectionDTO))
+}
+export function getElectionSettings(electionId : string, userId : string) : Promise<ElectionDTO>
+{
+    return fetch(`https://localhost:5001/election/${electionId}/settings`)
+        .then(res => res.json().then(res => res as ElectionDTO))
 }
 
-export function saveCandidates(electionId : string, userId : string, candidates: Candidate[])
+export function saveElectionCandidates(electionId : string, userId : string, election: ElectionDTO)
 {
-    let election : Election = {electionId: electionId, candidates:candidates}
-
-    fetch(`https://localhost:5001/election/${electionId}`,
+    fetch(`https://localhost:5001/election/${electionId}/candidates`,
         {method: "POST", headers:{"Content-Type":"application/json"},
             body:JSON.stringify(election)})
 }
-
-export function getVote(electionId: string, userId : string) : Promise<UserVote>
+export function saveElectionSettings(electionId : string, userId : string, settings: ElectionSettingsDTO)
 {
-    return fetch(`https://localhost:5001/vote/${electionId}/${userId}`)
-        .then(res => res.json().then(result => result as UserVote))
-}
-
-export function saveVote(electionId:string, userId: string, choices : Candidate[]) : Promise<UserVote>
-{
-    let election : UserVote = {electionId: electionId,userId:userId, choices:choices, submitted:false}
-
-    return fetch(`https://localhost:5001/vote/${electionId}`,
+    fetch(`https://localhost:5001/election/${electionId}/settings`,
         {method: "POST", headers:{"Content-Type":"application/json"},
-            body:JSON.stringify(election)})
-        .then(res => res.json().then(res => res as UserVote))
+            body:JSON.stringify(settings)})
 }
-
-export function submitVote(electionId:string, userId: string, choices: Candidate[])
+export function getElectionResults(electionId : string, userId : string) : Promise<ElectionDTO>
 {
-    let election : UserVote = {electionId: electionId,userId:userId, choices:choices, submitted: true}
-
-    fetch(`https://localhost:5001/vote/${electionId}/vote`,
-        {method: "POST", headers:{"Content-Type":"application/json"},
-            body:JSON.stringify(election)})
+    return fetch(`https://localhost:5001/election/${electionId}/results`)
+        .then(res => res.json().then(res => res as ElectionDTO))
+}
+export function startElection(electionId : string, userId : string) : Promise<boolean>
+{
+    return fetch(`https://localhost:5001/election/${electionId}/start`)
+        .then(res => res.json().then(res => res as boolean ))
+}
+export function endElection(electionId : string, userId : string) : Promise<boolean>
+{
+    return fetch(`https://localhost:5001/election/${electionId}/end`)
+        .then(res => res.json().then(res => res as boolean ))
+}
+export function restartElection(electionId : string, userId : string) : Promise<boolean>
+{
+    return fetch(`https://localhost:5001/election/${electionId}/restart`)
+        .then(res => res.json().then(res => res as boolean ))
 }

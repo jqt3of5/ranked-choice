@@ -5,14 +5,14 @@ import '../Common/common.css'
 import { DndProvider } from 'react-dnd';
 import {HTML5Backend} from "react-dnd-html5-backend";
 import {CardTableActionType, card_table_reducer} from "./CardTableReducer";
-import {Candidate, Election} from "../Common/Data";
+import {CandidateDTO, ElectionDTO} from "../Common/Data";
 import {Card, CardData} from "../Components/Card";
-import {getElection, saveCandidates} from "../Common/ElectionModel";
 import {useCookies} from "react-cookie";
 import {v4} from "uuid";
 import {useParams} from "react-router-dom";
 import {BiDuplicate} from "react-icons/bi";
 import {CardTable} from "../Components/Table";
+import {getElectionCandidates, saveElectionCandidates} from "../Common/ElectionModel";
 
 export function CreateElectionView() {
     var [state, dispatch] = useReducer(card_table_reducer, {
@@ -33,7 +33,7 @@ export function CreateElectionView() {
     let electionId = params.electionId as string
 
     useEffect(() => {
-        getElection(electionId, cookies.userId).then((election => {
+        getElectionCandidates(electionId, cookies.userId).then((election => {
             let candidateCardData = election.candidates.map(c => {return {id:c.candidateId, text: c.value}})
 
             dispatch({type:CardTableActionType.SetCards, cards: [candidateCardData]})
@@ -42,11 +42,11 @@ export function CreateElectionView() {
 
     useEffect(() => {
         //Seems to be really chatty. Probably should diff and check
-        let candidates : Candidate[] = state.table[0].map(value => {return {electionId: electionId, candidateId: value.id, value: value.text}})
-        saveCandidates(electionId, cookies.userId, candidates)
+        let candidates : CandidateDTO[] = state.table[0].map(value => {return {electionId: electionId, candidateId: value.id, value: value.text}})
+        let election :ElectionDTO = {electionId: electionId, candidates: candidates}
+        saveElectionCandidates(electionId, cookies.userId, election)
     }, [state.table])
 
-    //TODO: Deleting then adding cards will mess up the card ids
 
     let electionUrl = `http://localhost:3000/vote/${electionId}`
     return <div className={"create-election-view"}>
@@ -63,8 +63,7 @@ export function CreateElectionView() {
                     {state.table[0].map((card, index) => {
                         return <Card key={"card" + card.id} card={card}
                                      index={index} column={0}
-                                     canEdit={true} canReorder={true}
-                                     showRank={false}
+                                     canEdit={true} canReorder={true} canDelete={true}
                                      dispatch={dispatch}/>
                     })}
 

@@ -26,12 +26,47 @@ namespace RankedChoiceServices.Controllers
             _repo = repository;
         }
 
+        [HttpPost("{electionId}/vote")]
+        public bool SubmitVote(string electionId, [FromBody]string [] candidateIds, [FromHeader(Name = "userId")] string userId)
+        {
+            var election = _repo.Get(electionId);
+            if (election == null)
+            {
+                _logger.Log(LogLevel.Warning, "Election with Id {electionId} does not exist", electionId);
+                Response.StatusCode = 404;
+                return false;
+            }
+
+            List<Candidate> candidates = new List<Candidate>();
+            foreach (var candidateId in candidateIds)
+            {
+                var candidate = election.Candidates.FirstOrDefault(c => c.candidateId == candidateId);
+                if (candidate == null)
+                {
+                    //That id is not valid, fail!
+                    _logger.Log(LogLevel.Warning, "candidate with Id {candidateId} does not exist", candidateId);
+                    Response.StatusCode = 400;
+                    return false;
+                }
+                
+                candidates.Add(candidate);
+            }
+            
+            election.AddVote(new Vote(userId, candidates.ToArray()));
+
+            return true;
+        }
         
         [HttpPost("{electionId}/start")]
         public bool StartElection(string electionId)
         {
             var election = _repo.Get(electionId);
-            
+            if (election == null)
+            {
+                _logger.Log(LogLevel.Warning, "Election with Id {electionId} does not exist", electionId);
+                Response.StatusCode = 404;
+                return false;
+            } 
             return election.StartElection();
         }
         
@@ -39,7 +74,12 @@ namespace RankedChoiceServices.Controllers
         public bool EndElection(string electionId)
         {
             var election = _repo.Get(electionId);
-
+            if (election == null)
+            {
+                _logger.Log(LogLevel.Warning, "Election with Id {electionId} does not exist", electionId);
+                Response.StatusCode = 404;
+                return false;
+            }
             return election.StopElection();
         }
         
@@ -47,31 +87,64 @@ namespace RankedChoiceServices.Controllers
         public bool RestartElection(string electionId)
         {
             var election = _repo.Get(electionId);
+            if (election == null)
+            {
+                _logger.Log(LogLevel.Warning, "Election with Id {electionId} does not exist", electionId);
+                Response.StatusCode = 404;
+                return false;
+            }
             return election.RestartElection();
         }
         
         [HttpGet("{electionId}/results")]
-        public ElectionDTO GetElectionResults(string electionId)
+        public ElectionDTO? GetElectionResults(string electionId)
         {
             var election = _repo.Get(electionId);
-
+            if (election == null)
+            {
+                Response.StatusCode = 404;
+                _logger.Log(LogLevel.Warning, "Election with Id {electionId} does not exist", electionId);
+                return null;
+            }
             return new ElectionDTO(electionId,
                 election.CalculateResults().Select(c => new CandidateDTO(c.value, c.candidateId)).ToArray());
         }
         
         [HttpGet("{electionId}/settings")]
-        public ElectionSettingsDTO GetSettings(string electionId)
+        public ElectionSettingsDTO? GetSettings(string electionId)
         {
             var election = _repo.Get(electionId);
-            
+            if (election == null)
+            {
+                Response.StatusCode = 404;
+                _logger.Log(LogLevel.Warning, "Election with Id {electionId} does not exist", electionId);
+                return null;
+            } 
             return new ElectionSettingsDTO(electionId, election.UniqueIdsPerUser, 
                 election.UniqueElectionIds.ToArray(), election.Users.Select(u => u.email).ToArray(), election.State);
         }
         
         [HttpGet("{electionId}/candidates")]
-        public ElectionDTO GetCandidates(string electionId)
+        public ElectionDTO? GetCandidates(string electionId)
         {
             var election = _repo.Get(electionId);
+            if (election == null)
+            {
+                election = _repo.GetByUniqueUserId(electionId);
+                if (election == null)
+                {
+                    Response.StatusCode = 404;
+                    _logger.Log(LogLevel.Warning, "Election with Id {electionId} does not exist", electionId);
+                    return null;
+                }
+
+                if (!election.UniqueIdsPerUser)
+                {
+                    Response.StatusCode = 404;
+                    _logger.Log(LogLevel.Warning, "Attempting to get election with Id {election.ElectionId} by unique Id {uniqueId} failed, because UniqueIdesPerUser is not enabled", election.ElectionId, electionId);
+                    return null;
+                }
+            } 
             
             return new ElectionDTO(electionId, 
                 election.Candidates.Select(c => 
@@ -91,11 +164,17 @@ namespace RankedChoiceServices.Controllers
             
             if (!_repo.Exists(electionId))
             {
+                _repo.Create(electionId);
                 _logger.Log(LogLevel.Information, "New election created with Id {electionId}", electionId);
             }
             
             var election = _repo.Get(electionId);
-
+            if (election == null)
+            {
+                _logger.Log(LogLevel.Warning, "Election with Id {electionId} does not exist", electionId);
+                Response.StatusCode = 404;
+                return false;
+            }
             election.SetUserEmails(settings.userEmails);
             election.UniqueIdsPerUser = settings.uniqueIdsPerUser;
 
@@ -116,12 +195,18 @@ namespace RankedChoiceServices.Controllers
             if (!_repo.Exists(electionId))
             {
                 _logger.Log(LogLevel.Information, "New election created with Id {electionId}", electionId);
+                _repo.Create(electionId);
             }
             
             _logger.Log(LogLevel.Information, "Election with Id {electionId} Saved", electionId);
 
             var election = _repo.Get(electionId);
-
+            if (election == null)
+            {
+                _logger.Log(LogLevel.Warning, "Election with Id {electionId} does not exist", electionId);
+                Response.StatusCode = 404;
+                return false;
+            }
             var candidates = dto.candidates.Select(c => new Candidate(c.value, c.candidateId)).ToArray();
             election.Candidates = candidates;
             

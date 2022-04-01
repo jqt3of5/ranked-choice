@@ -1,9 +1,8 @@
 .vote-view, .vote-view-table {
     height: 100%;
-}
-.vote-view-table {
-    display:flex;
-    align-items: start;
+    display: flex;
     justify-content: center;
 }
+
+
 

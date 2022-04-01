@@ -1,17 +1,28 @@
-export interface Candidate {
-    electionId : string
+export interface CandidateDTO {
     candidateId : string
     value : string
 }
 
-export interface Election {
+export interface ElectionDTO {
     electionId : string
-    candidates : Candidate[]
+    candidates : CandidateDTO[]
 }
 
-export interface UserVote {
-    submitted: boolean
+export enum ElectionState {
+    New,
+    Started,
+    Finished
+}
+
+export interface ElectionSettingsDTO {
     electionId : string
-    userId : string
-    choices : Candidate[]
+    uniqueIdsPerUser : string
+    uniqueIds : string[]
+    userEmails : string[]
+    state : ElectionState,
+}
+
+export interface VoteDTO {
+    submitted : boolean
+    candidates: CandidateDTO[]
 }

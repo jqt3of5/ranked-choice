@@ -40,7 +40,6 @@ C:\Users\jqt3o\sd\ranked-choice\RankedChoiceServices\RankedChoiceServices\bin\De
 C:\Users\jqt3o\sd\ranked-choice\RankedChoiceServices\RankedChoiceServices\bin\Debug\net5.0\Swashbuckle.AspNetCore.Swagger.dll
 C:\Users\jqt3o\sd\ranked-choice\RankedChoiceServices\RankedChoiceServices\bin\Debug\net5.0\Swashbuckle.AspNetCore.SwaggerGen.dll
 C:\Users\jqt3o\sd\ranked-choice\RankedChoiceServices\RankedChoiceServices\bin\Debug\net5.0\Swashbuckle.AspNetCore.SwaggerUI.dll
-C:\Users\jqt3o\sd\ranked-choice\RankedChoiceServices\RankedChoiceServices\obj\Debug\net5.0\RankedChoiceServices.csprojAssemblyReference.cache
 C:\Users\jqt3o\sd\ranked-choice\RankedChoiceServices\RankedChoiceServices\obj\Debug\net5.0\RankedChoiceServices.GeneratedMSBuildEditorConfig.editorconfig
 C:\Users\jqt3o\sd\ranked-choice\RankedChoiceServices\RankedChoiceServices\obj\Debug\net5.0\RankedChoiceServices.AssemblyInfoInputs.cache
 C:\Users\jqt3o\sd\ranked-choice\RankedChoiceServices\RankedChoiceServices\obj\Debug\net5.0\RankedChoiceServices.AssemblyInfo.cs
@@ -56,3 +55,4 @@ C:\Users\jqt3o\sd\ranked-choice\RankedChoiceServices\RankedChoiceServices\obj\De
 C:\Users\jqt3o\sd\ranked-choice\RankedChoiceServices\RankedChoiceServices\obj\Debug\net5.0\ref\RankedChoiceServices.dll
 C:\Users\jqt3o\sd\ranked-choice\RankedChoiceServices\RankedChoiceServices\obj\Debug\net5.0\RankedChoiceServices.pdb
 C:\Users\jqt3o\sd\ranked-choice\RankedChoiceServices\RankedChoiceServices\obj\Debug\net5.0\RankedChoiceServices.genruntimeconfig.cache
+C:\Users\jqt3o\sd\ranked-choice\RankedChoiceServices\RankedChoiceServices\obj\Debug\net5.0\RankedChoiceServices.csproj.AssemblyReference.cache

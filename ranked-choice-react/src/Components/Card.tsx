@@ -16,9 +16,9 @@ export interface CardProps {
     index: number
     column: number
 
-    showRank : boolean
     canReorder: boolean
     canEdit: boolean
+    canDelete: boolean
 
     dispatch : (action : CardTableAction) => void
 }
@@ -62,7 +62,6 @@ export function Card(props : CardProps) {
             if (props.canReorder)
             {
                 props.dispatch({type:CardTableActionType.MoveCard, sourceIndex: item.index, sourceColumn: item.column, destIndex: props.index, destColumn: props.column})
-
                 //Update the drag item, otherwise the system gets confused and continuously tries to update
                 item.index = props.index
                 item.column = props.column
@@ -94,7 +93,7 @@ export function Card(props : CardProps) {
 
         {editing && <textarea ref={textArea} value={text} onChange={event => setState(state => {return {...state, text: event.target.value}})}/>}
 
-        {props.canEdit && <MdDeleteOutline className={"card-delete"} onClick={event => {
+        {props.canDelete && <MdDeleteOutline className={"card-delete"} onClick={event => {
             props.dispatch({type:CardTableActionType.DeleteCard, index: props.index, column: props.column})
         }}/>}
     </div>

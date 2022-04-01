@@ -13,6 +13,8 @@ namespace RankedChoiceServices.Entities
 
     public interface IElection
     {
+        public string ElectionId { get; }
+        
         //TODO: Doesn't include metadata, like dates, and users, etc. 
         public IReadOnlyList<IReadOnlyList<Candidate>> History { get; }
         public IReadOnlyList<Candidate> Candidates { get; set;  }
@@ -27,6 +29,7 @@ namespace RankedChoiceServices.Entities
         }
         public ElectionState State { get; }
 
+        public bool AddVote(Vote vote);
         public bool StartElection();
         public bool StopElection();
         public bool RestartElection();
@@ -37,9 +40,10 @@ namespace RankedChoiceServices.Entities
     
     public class ElectionEntity : IElection
     {
-        private string ElectionId
+        public string ElectionId
         {
             get;
+            set;
         }
 
         private List<IReadOnlyList<Candidate>> _history = new();
@@ -142,11 +146,16 @@ namespace RankedChoiceServices.Entities
             {
                 return false;
             }
-            _users.Clear();
+
+            //Do a diff, and find the added emails
+            var added = emails.Where(e => _users.All(u => u.email != e));
             
-            var users = emails.Select(e => new User(e, new Guid().ToString()));
+            //concat the new ones onto thelist
+            var users = _users
+                .Where(u => emails.Any(e => e == u.email))
+                .Concat(added.Select(e => new User(e, new Guid().ToString())));
+            
             _users.AddRange(users);
-            
             return true;
         }
 

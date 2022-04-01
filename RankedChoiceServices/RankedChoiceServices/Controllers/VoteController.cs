@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using System.Linq;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using RankedChoiceServices.Entities;
 
@@ -8,70 +9,70 @@ namespace RankedChoiceServices.Controllers
     [Route("[controller]")]
     public class VoteController : ControllerBase
     {
+        public record VoteDTO(bool submitted, ElectionController.CandidateDTO[] candidates);
+        
         private readonly ILogger<VoteController> _logger;
         private readonly ElectionRepository _electionRepository;
+        private readonly VoteRepository _voteRepository;
 
-        public VoteController(ILogger<VoteController> logger, ElectionRepository electionRepository)
+        public VoteController(ILogger<VoteController> logger, ElectionRepository electionRepository, VoteRepository voteRepository)
         {
             _logger = logger;
             _electionRepository = electionRepository;
+            _voteRepository = voteRepository;
         }
         
         [HttpPost("{electionId}")]
-        public UserVote SaveCandidateSelection(string electionId, [FromBody] UserVote vote)
+        public bool SaveCandidates(string electionId, [FromBody] VoteDTO vote, [FromHeader(Name = "userId")] string userId)
         {
-            if (vote.electionId != electionId)
+            var entity = _voteRepository.GetForUser(userId, electionId);
+            if (entity == null)
             {
-                HttpContext.Response.StatusCode = 400;
-                return vote;
-            }
-            
-            //TODO: Make sure the user is correct too
-            
-            
-            //If the user has already submitted their vote, do nothing but return to them their old vote. 
-            if (_voteRepository.UserVoteSubmitted(vote.userId, vote.electionId))
-            {
-                return _voteRepository.GetVote(vote.userId, vote.electionId);
-            }
-            
-            //This endpoint cannot be used to submit a vote
-            vote.submitted = false;
-            
-            if (_electionRepository.Get(electionId) is {} election)
-            {
-                //We want to add a little security, this prevents users from sending invalid candidates. 
-                var candidates = vote.choices 
-                    .Select(candidate => election.candidates.FirstOrDefault(c => c.candidateId == candidate.candidateId))
-                    .Where(candidate => candidate != null)
-                    //Removes the nullable because we just filtered
-                    .Cast<Candidate>()
-                    .ToArray();
-            
-                //TODO: Deduplicate vote list?
-                
-                _voteRepository.SaveUserVote(vote.userId, vote.electionId, new UserVote(vote.electionId, vote.userId, candidates));
-
-                _logger.Log(LogLevel.Trace, "Vote saved for user {userId} for election {electionId}", vote.userId, vote.electionId);
-                return _voteRepository.GetVote(vote.userId, vote.electionId); 
+                _logger.Log(LogLevel.Warning, "Vote for user {userId} for election {electionId}", userId, electionId);
+                entity = _voteRepository.Create(userId, electionId);
             }
 
-            _logger.Log(LogLevel.Trace, "Vote note saved for user {userId} electionId {electionId} not found", vote.userId, vote.electionId);
-            HttpContext.Response.StatusCode = 404;
-            return null;
+            if (entity.Submitted == true)
+            {
+                return false;
+            }
+
+            entity.Candidates = vote.candidates.Select(c => new Candidate(c.value, c.candidateId)).ToList();
+             
+            _voteRepository.SaveForUser(userId, electionId, entity);
+
+            return true;
         }
         
-        [HttpPost("{electionId}/vote")]
-        public void SubmitVote(string electionId, [FromBody] UserVote vote)
+        [HttpGet("{electionId}")]
+        public VoteDTO? GetCandidates(string electionId,  [FromHeader(Name = "userId")] string userId)
         {
-            _logger.Log(LogLevel.Trace, "Vote submitted for user {userId} for election {electionId}", vote.userId, vote.electionId);
-           _voteRepository.SubmitVote(vote.userId, vote.electionId); 
+            var entity = _voteRepository.GetForUser(userId, electionId);
+            if (entity == null)
+            {
+                _logger.Log(LogLevel.Warning, "Vote for user {userId} for election {electionId}", userId, electionId);
+                entity = _voteRepository.Create(userId, electionId);
+            }
+
+            return new VoteDTO(entity.Submitted, entity.Candidates.Select(e => new ElectionController.CandidateDTO(e.value, e.candidateId)).ToArray());
         }
 
-        [HttpGet("{electionId}/{userId}")]
-        public UserVote GetVote(string electionId, string userId)
+        [HttpGet("{electionId}/submit")]
+        public bool SubmitVote(string electionId, [FromHeader(Name = "userId")]string userId)
         {
-            return _voteRepository.GetVote(userId, electionId);
+            var entity = _voteRepository.GetForUser(userId, electionId);
+            if (entity == null)
+            {
+                _logger.Log(LogLevel.Warning, "Vote for user {userId} for election {electionId}", userId, electionId);
+                Response.StatusCode = 404;
+                return false;
+            }
+
+            entity.Submitted = true;
+
+            _voteRepository.SaveForUser(userId, electionId, entity);
+
+            return true;
         }
     }
 }
