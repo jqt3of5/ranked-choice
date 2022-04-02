@@ -10,9 +10,10 @@
     display:flex;
     padding:8px;
     padding-left: 12px;
-    border-radius: 2px;
+    border-radius: 8px;
+    border: solid darkgrey 1px;
     background-color: white;
-    box-shadow: lightgrey 2px 2px 2px 2px;
+    box-shadow: lightgrey 3px 3px 3px 3px;
 }
 
 .card-delete {

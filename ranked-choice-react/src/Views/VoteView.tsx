@@ -93,6 +93,9 @@ export function VoteView() {
     //TODO: If no election exists, show error
 
     return <div className={"vote-view"}>
+        <div className={"vote-view-header primary"}>
+            <button>Submit Vote</button>
+        </div>
         <CardTable>
            <Column canEdit={false} canReorder={true} name={"Candidates"} column={0} showRank={false} dispatch={dispatch}>
                {tableState.table[0].map((card, index) => {

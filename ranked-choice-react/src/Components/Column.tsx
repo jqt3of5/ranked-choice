@@ -62,7 +62,7 @@ export function Column(props : ColumnProps) {
             )
         */}
 
-            {props.canEdit && <div className={"add-new-card"} onClick={event => props.dispatch({type:CardTableActionType.AddCard, column:props.column})}><IoAdd/>Add new card</div>}
+            {props.canEdit && <div className={"add-new-card secondary"} onClick={event => props.dispatch({type:CardTableActionType.AddCard, column:props.column})}><IoAdd/>Add new card</div>}
         </div>
     </div>
 }

@@ -1,8 +1,15 @@
+.primary {
+    background-color:#3b8c81;
+}
+.secondary {
+   color: #ee024e;
+}
 .box{
     margin: 8px;
     padding: 8px;
-    background-color: aliceblue;
+    /*background-color: aliceblue;*/
     border-radius: 8px;
+    border: solid darkgrey 1px;
     box-shadow: darkgray 4px 4px 4px 4px;
 }
 .masked-background {

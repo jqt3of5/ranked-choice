@@ -1,7 +1,16 @@
 .vote-view {
     height: 100%;
     display: flex;
-    justify-content: center;
+    flex-direction: column;
+
+    /*justify-content: center;*/
+    align-items: center;
+}
+
+.vote-view-header {
+    padding:16px;
+    align-self: stretch;
+    box-shadow: darkgrey 4px 4px 4px;
 }
 
 .card-table {
