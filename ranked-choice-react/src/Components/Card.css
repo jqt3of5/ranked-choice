@@ -1,13 +1,18 @@
 .card{
-    margin-top:6px;
-    margin-bottom:6px;
+    padding-top:6px;
+    padding-bottom:6px;
+    flex-grow: 1;
+}
+.card-content:hover {
+    background-color: lightgrey;
+}
+.card-content{
+    display:flex;
     padding:8px;
     padding-left: 12px;
     border-radius: 2px;
     background-color: white;
     box-shadow: lightgrey 2px 2px 2px 2px;
-    display:flex;
-    flex-grow: 1;
 }
 
 .card-delete {
@@ -30,4 +35,7 @@
     flex-grow: 1;
     /*the idea is that there will be a masked background, and we want this on top */
     z-index: 10;
+}
+.card svg{
+    flex-shrink: 0;
 }

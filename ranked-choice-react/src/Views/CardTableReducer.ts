@@ -49,9 +49,7 @@ export function card_table_reducer(state : CardTableState, action : CardTableAct
             return {...state, table: state.table.map((column, col) => {
                     if (action.column == col)
                     {
-                        return column.filter((card, index) => {
-                            return index !== action.index
-                        })
+                        column.splice(action.index, 1)
                     }
                     return column
                 })
@@ -69,13 +67,12 @@ export function card_table_reducer(state : CardTableState, action : CardTableAct
             }
         case CardTableActionType.MoveCard:
             let c = state.table[action.sourceColumn][action.sourceIndex]
-            let removed = state.table.map((column, col) => {
+            let removed = state.table.map((cd, col) => {
+                let column = cd.map(a => a)
 
                 if (col === action.sourceColumn)
                 {
-                    column = column.filter((card, index) => {
-                        return index !== action.sourceIndex
-                    })
+                    column.splice(action.sourceIndex, 1)
                 }
 
                 if (col === action.destColumn)

@@ -41,10 +41,10 @@ export function Card(props : CardProps) {
     const ref = useRef<HTMLDivElement>(null)
     const textArea = useRef<HTMLTextAreaElement>(null)
 
-    const [{isDragging}, drag] = useDrag({
+    const [{handlerId, isDragging}, drag] = useDrag({
         type: ItemTypes.CARD,
         collect: monitor => {
-            return {isDragging: monitor.isDragging()}
+            return {handlerId: monitor.getHandlerId(), isDragging: monitor.isDragging()}
         },
         item: monitor => {
            return {index: props.index, column: props.column, id: props.card.id, type: ItemTypes.CARD}
@@ -52,19 +52,22 @@ export function Card(props : CardProps) {
         canDrag: monitor => props.canReorder && !editing
     })
 
-    const [{isOver}, drop] = useDrop<DragItem, void, {isOver: boolean}>({
+    const [{isOver},drop] = useDrop<DragItem, void, {isOver : boolean}>({
         accept: ItemTypes.CARD,
         // drop: () => props.moveCard(props.index),
         collect: monitor => {
             return {isOver: monitor.isOver()}
         },
-        hover: (item: DragItem, monitor ) => {
-            if (props.canReorder)
+        hover(item: DragItem, monitor) {
+            if (props.canReorder && item.id !== props.card.id)
             {
-                props.dispatch({type:CardTableActionType.MoveCard, sourceIndex: item.index, sourceColumn: item.column, destIndex: props.index, destColumn: props.column})
-                //Update the drag item, otherwise the system gets confused and continuously tries to update
+                props.dispatch({type:CardTableActionType.MoveCard,
+                    sourceIndex: item.index, sourceColumn: item.column,
+                    destIndex: props.index, destColumn: props.column})
+                //while dragging, the item needs to update, so on subsequent calls to this method will pass the correct values to dispatch
                 item.index = props.index
                 item.column = props.column
+                // item.id = props.card.id
             }
         },
         // canDrop: (item, monitor) => !props.canReorder
@@ -80,21 +83,23 @@ export function Card(props : CardProps) {
         }
     }, [editing]);
 
-    drag(drop(ref))
-    return <div ref={ref} className={"card"} style={{opacity: isOver? 0.5 : 1}}>
+    drag(ref)
+    drop(ref)
+    return <div ref={ref} className={"card"} data-handler-id={handlerId}>
+        <div className={"card-content"}  style ={{opacity: isOver? 0.4 : 1, backgroundColor: isOver ? "lightgray" : "white"}}>
+            {!props.canEdit && <label>{props.card.text}</label>}
+            {props.canEdit && !editing && <label onDoubleClick={event => setState({text:props.card.text, editing: true})}>{props.card.text}</label>}
 
-        {!props.canEdit && <label>{props.card.text}</label>}
-        {props.canEdit && !editing && <label onDoubleClick={event => setState({text:props.card.text, editing: true})}>{props.card.text}</label>}
+            {editing && <div className={"masked-background"} onClick={event => {
+                props.dispatch({type:CardTableActionType.EditCard, card:{...props.card, text:text}, index: props.index, column: props.column})
+                setState({text: text, editing: false})
+            }}/>}
 
-        {editing && <div className={"masked-background"} onClick={event => {
-            props.dispatch({type:CardTableActionType.EditCard, card:{...props.card, text:text}, index: props.index, column: props.column})
-            setState({text: text, editing: false})
-        }}/>}
+            {editing && <textarea ref={textArea} value={text} onChange={event => setState(state => {return {...state, text: event.target.value}})}/>}
 
-        {editing && <textarea ref={textArea} value={text} onChange={event => setState(state => {return {...state, text: event.target.value}})}/>}
-
-        {props.canDelete && <MdDeleteOutline className={"card-delete"} onClick={event => {
-            props.dispatch({type:CardTableActionType.DeleteCard, index: props.index, column: props.column})
-        }}/>}
+            {props.canDelete && <MdDeleteOutline className={"card-delete"} onClick={event => {
+                props.dispatch({type:CardTableActionType.DeleteCard, index: props.index, column: props.column})
+            }}/>}
+        </div>
     </div>
 }

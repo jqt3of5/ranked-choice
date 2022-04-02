@@ -6,13 +6,13 @@ export function submitVote(electionId : string, userId : string, vote : VoteDTO)
     return fetch(`https://localhost:5001/election/${electionId}/vote`, {
         method: 'POST',
         headers:{"Content-Type":"application/json", "userId":userId},
-        body:JSON.stringify(vote.candidates)
-    })
-        .then(res => res.json().then(res => {
+        body:JSON.stringify(vote.candidates.map(c => c.candidateId))
+    }).then(res => res.json().then(res => {
             if (res as boolean)
             {
-                return fetch(`https://localhost:5001/vote/${electionId}/submit`)
-                    .then(res => res.json())
+                return fetch(`https://localhost:5001/vote/${electionId}/submit`, {
+                    headers:{"userId":userId}
+                }).then(res => res.json())
             }
             return false
         }))

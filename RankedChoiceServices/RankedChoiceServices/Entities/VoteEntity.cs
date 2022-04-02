@@ -35,6 +35,7 @@ namespace RankedChoiceServices.Entities
         {
             UserId = userId;
             ElectionId = electionId;
+            Candidates = new List<Candidate>();
         }
     }
 }

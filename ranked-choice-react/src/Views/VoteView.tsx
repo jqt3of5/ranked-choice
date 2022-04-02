@@ -2,8 +2,6 @@ import React, {useEffect, useReducer, useState} from 'react';
 import {Column} from '../Components/Column';
 import './VoteView.css'
 import '../Common/common.css'
-import { DndProvider } from 'react-dnd';
-import {HTML5Backend} from "react-dnd-html5-backend";
 import {CardTableActionType, CardTableState, card_table_reducer} from "./CardTableReducer";
 import {CandidateDTO, VoteDTO} from "../Common/Data";
 import {useCookies} from "react-cookie";
@@ -58,7 +56,7 @@ export function VoteView() {
 
                             candidateCardData = candidateCardData.filter(card => voteCardData.find(c => c.id == card.id) == undefined)
 
-                            //TODO: Diff candidate/choice lists
+                            setState(state => {return {...state, isReadOnly: vote.submitted}})
                             dispatch({type:CardTableActionType.SetCards, cards: [candidateCardData, voteCardData]})
                         },
                         (error) => {
@@ -81,9 +79,12 @@ export function VoteView() {
         let vote : VoteDTO = {submitted: false, candidates: chois}
         saveVote(electionId, cookies.userId, vote).then(
             (vote) => {
-                setState(state => {
-                    return {...state, choices:chois, candidates: cands}
-                })
+                if (vote)
+                {
+                    setState(state => {
+                        return {...state, choices:chois, candidates: cands}
+                    })
+                }
             },
             (error) => {}
         )
@@ -97,30 +98,18 @@ export function VoteView() {
                {tableState.table[0].map((card, index) => {
                     return <Card key={"card" + card.id} card={card}
                                  index={index} column={0}
-                                 canEdit={false} canReorder={true} canDelete={false}
+                                 canEdit={false} canReorder={!isReadOnly} canDelete={false}
                                  dispatch={dispatch}/>
                })}
            </Column>
-            <div>
-                <Column canEdit={false} canReorder={true} name={"Ranked Choices"} column={1} showRank={true} dispatch={dispatch}>
-                    {tableState.table[1].map((card, index) => {
-                        return <Card key={"card" + card.id} card={card}
-                                     index={index} column={1}
-                                     canEdit={false} canReorder={true} canDelete={true}
-                                     dispatch={dispatch}/>
-                    })}
-
-                </Column>
-                <div className={"box"}>
-                    <button onClick={event => {
-                        let vote : VoteDTO = {candidates: choices, submitted:true}
-                        submitVote(electionId, cookies.userId, vote)
-                        setState(state => {
-                            return {...state, isReadOnly:true}
-                        })
-                    }}>Submit</button>
-                </div>
-            </div>
+            <Column canEdit={false} canReorder={true} name={"Ranked Choices"} column={1} showRank={true} dispatch={dispatch}>
+                {tableState.table[1].map((card, index) => {
+                    return <Card key={"card" + card.id} card={card}
+                                 index={index} column={1}
+                                 canEdit={false} canReorder={!isReadOnly} canDelete={!isReadOnly}
+                                 dispatch={dispatch}/>
+                })}
+            </Column>
         </CardTable>
     </div>
 }
