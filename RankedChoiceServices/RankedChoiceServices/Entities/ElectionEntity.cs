@@ -177,8 +177,29 @@ namespace RankedChoiceServices.Entities
         
         public IEnumerable<Candidate> CalculateResults()
         {
-            //TODO: Do this 
-            return _candidates;
+            if (_candidates.Count() <= 1)
+            {
+                return _candidates;
+            }
+
+            Dictionary<string, int> counts = _candidates.ToDictionary(c => c.candidateId, c => 0);
+            for (int round = 0; round < _candidates.Count; ++round)
+            {
+                var votes = _votes
+                //Some votes might not have picked all candidates
+                    .Where(v => v.candidates.Count() > round)
+                //Group them by their selected candidate for this round
+                    .GroupBy(v => v.candidates[round].candidateId)
+                    .ToList();
+
+                votes.Sort((a, b) =>
+                {
+                    return a.Count() - b.Count();
+                });
+                
+                
+
+            }
         }
     }
 }

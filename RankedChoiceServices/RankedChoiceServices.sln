@@ -2,6 +2,8 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RankedChoiceServices", "RankedChoiceServices\RankedChoiceServices.csproj", "{34FBD9B1-6CEA-4D83-84C2-E9B122619C5A}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RankedChoiceServices.UnitTests", "RankedChoiceServices.UnitTests\RankedChoiceServices.UnitTests.csproj", "{726A2C41-C5DA-4E15-B89A-F30BEF6177E1}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -12,5 +14,9 @@ Global
 		{34FBD9B1-6CEA-4D83-84C2-E9B122619C5A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{34FBD9B1-6CEA-4D83-84C2-E9B122619C5A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{34FBD9B1-6CEA-4D83-84C2-E9B122619C5A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{726A2C41-C5DA-4E15-B89A-F30BEF6177E1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{726A2C41-C5DA-4E15-B89A-F30BEF6177E1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{726A2C41-C5DA-4E15-B89A-F30BEF6177E1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{726A2C41-C5DA-4E15-B89A-F30BEF6177E1}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
