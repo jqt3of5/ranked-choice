@@ -1,0 +1,25 @@
+name: Deploy Ranked Choice Vote App to S3
+on:
+  push:
+    branches:
+      - beta-react
+env:
+  AWS_REGION: us-west-1                   # set this to your preferred AWS region, e.g. us-west-1
+jobs:
+  upload:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2
+        with:
+          node-version: '14'
+      - run: npm install
+        working-directory: ranked-choice-react/
+      - run: npm run-script build
+        working-directory: ranked-choice-react/
+      - uses: shallwefootball/s3-upload-action@master
+        with:
+          aws_key_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY}}
+          aws_bucket: ${{ secrets.AWS_S3_BUCKET}}
+          source_dir: 'ranked-choice-react/build'
