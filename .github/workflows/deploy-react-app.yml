@@ -23,3 +23,4 @@ jobs:
           aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY}}
           aws_bucket: ${{ secrets.AWS_S3_BUCKET}}
           source_dir: 'ranked-choice-react/build'
+          destination_dir: 'beta'
