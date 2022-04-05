@@ -47,7 +47,7 @@ export function card_table_reducer(state : CardTableState, action : CardTableAct
                 )}
         case CardTableActionType.DeleteCard:
             return {...state, table: state.table.map((column, col) => {
-                    if (action.column == col)
+                    if (action.column === col)
                     {
                         column.splice(action.index, 1)
                     }
@@ -57,7 +57,7 @@ export function card_table_reducer(state : CardTableState, action : CardTableAct
         case CardTableActionType.EditCard:
             return {...state, table: state.table.map((column, col) => {
                     return column.map((card, index) => {
-                        if (action.index == index && action.column == col)
+                        if (action.index === index && action.column === col)
                         {
                             return action.card
                         }

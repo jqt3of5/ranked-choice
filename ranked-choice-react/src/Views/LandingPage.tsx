@@ -1,6 +1,6 @@
 import './LandingPage.css'
 import '../Common/common.css'
-import { Outlet, Link } from "react-router-dom";
+import { Link } from "react-router-dom";
 import {v4} from "uuid";
 
 export function LandingPage() {

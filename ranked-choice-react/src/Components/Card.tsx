@@ -3,7 +3,7 @@ import './Card.css'
 import '../Common/common.css'
 import {useDrag, useDrop} from "react-dnd";
 import {MdDeleteOutline} from "react-icons/md";
-import {CardTableAction, CardTableActionType, CardTableState} from "../Views/CardTableReducer";
+import {CardTableAction, CardTableActionType} from "../Views/CardTableReducer";
 
 export interface CardData {
     id: string
@@ -41,7 +41,7 @@ export function Card(props : CardProps) {
     const ref = useRef<HTMLDivElement>(null)
     const textArea = useRef<HTMLTextAreaElement>(null)
 
-    const [{handlerId, isDragging}, drag] = useDrag({
+    const [{handlerId, }, drag] = useDrag({
         type: ItemTypes.CARD,
         collect: monitor => {
             return {handlerId: monitor.getHandlerId(), isDragging: monitor.isDragging()}

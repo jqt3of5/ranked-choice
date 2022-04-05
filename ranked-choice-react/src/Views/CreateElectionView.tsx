@@ -1,12 +1,10 @@
-import React, {useEffect, useReducer, useState} from 'react';
+import React, {useEffect, useReducer} from 'react';
 import {Column} from '../Components/Column';
 import './CreateElectionView.css'
 import '../Common/common.css'
-import { DndProvider } from 'react-dnd';
-import {HTML5Backend} from "react-dnd-html5-backend";
 import {CardTableActionType, card_table_reducer} from "./CardTableReducer";
 import {CandidateDTO, ElectionDTO} from "../Common/Data";
-import {Card, CardData} from "../Components/Card";
+import {Card} from "../Components/Card";
 import {useCookies} from "react-cookie";
 import {v4} from "uuid";
 import {useParams} from "react-router-dom";
@@ -28,7 +26,7 @@ export function CreateElectionView() {
     let params = useParams();
     if (params.electionId===undefined)
     {
-        throw "electionID cannot be undefined"
+        throw new Error("electionID cannot be undefined")
     }
     let electionId = params.electionId as string
 
@@ -38,20 +36,20 @@ export function CreateElectionView() {
 
             dispatch({type:CardTableActionType.SetCards, cards: [candidateCardData]})
         }))
-    },[electionId])
+    },[electionId, cookies.userId])
 
     useEffect(() => {
         //Seems to be really chatty. Probably should diff and check
         let candidates : CandidateDTO[] = state.table[0].map(value => {return {electionId: electionId, candidateId: value.id, value: value.text}})
         let election :ElectionDTO = {electionId: electionId, candidates: candidates}
         saveElectionCandidates(electionId, cookies.userId, election)
-    }, [state.table])
+    }, [state.table, cookies.userId, electionId])
 
 
     let electionUrl = `http://localhost:3000/vote/${electionId}`
     return <div className={"create-election-view"}>
 
-        <div className={"create-election-view-settings"}></div>
+        <div className={"create-election-view-settings"}/>
 
         <CardTable>
             <div>

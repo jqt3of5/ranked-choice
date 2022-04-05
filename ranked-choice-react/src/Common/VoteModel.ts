@@ -1,4 +1,4 @@
-import {CandidateDTO, VoteDTO} from "./Data";
+import {VoteDTO} from "./Data";
 
 export function submitVote(electionId : string, userId : string, vote : VoteDTO) : Promise<boolean>
 {

@@ -1,9 +1,9 @@
-import React, {ReactNode, useRef} from 'react';
-import {Card, CardData, DragItem, ItemTypes} from './Card'
+import React, {ReactNode} from 'react';
+import {DragItem, ItemTypes} from './Card'
 import "./Column.css"
 import "../Common/common.css"
-import {useDrag, useDrop} from "react-dnd";
-import {CardTableAction, CardTableActionType, CardTableState} from "../Views/CardTableReducer";
+import {useDrop} from "react-dnd";
+import {CardTableAction, CardTableActionType} from "../Views/CardTableReducer";
 import {IoAdd} from "react-icons/io5";
 
 export interface ColumnProps {
@@ -21,7 +21,7 @@ export interface ColumnProps {
 
 export function Column(props : ColumnProps) {
 
-    const [{isOver}, drop] = useDrop<DragItem, void, {isOver: boolean}>({
+    const [, drop] = useDrop<DragItem, void, {isOver: boolean}>({
         accept: ItemTypes.CARD,
         // drop: () => props.moveCard(props.index),
         collect: monitor => {

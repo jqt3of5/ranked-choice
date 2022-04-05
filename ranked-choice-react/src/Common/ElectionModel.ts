@@ -1,5 +1,4 @@
-import {CardData} from "../Components/Card";
-import {CandidateDTO, ElectionDTO, ElectionSettingsDTO, VoteDTO} from "./Data";
+import {ElectionDTO, ElectionSettingsDTO} from "./Data";
 
 export function getElectionCandidates(electionId : string, userId : string) : Promise<ElectionDTO>
 {
