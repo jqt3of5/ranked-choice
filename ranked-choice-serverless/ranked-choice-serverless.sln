@@ -1,0 +1,30 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RankedChoiceServerless", "src\RankedChoiceServerless\RankedChoiceServerless.csproj", "{4F4788E9-C9D2-4E80-A68C-9CC451708825}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RankedChoiceServerless.Tests", "test\HelloWorld.Test\RankedChoiceServerless.Tests.csproj", "{51467A66-95D9-4BF2-9EBB-43832E324E76}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{7F506405-1D23-41D8-811A-6EF308BFE877}"
+	ProjectSection(SolutionItems) = preProject
+		.gitignore = .gitignore
+		omnisharp.json = omnisharp.json
+		README.md = README.md
+		template.yaml = template.yaml
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{4F4788E9-C9D2-4E80-A68C-9CC451708825}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4F4788E9-C9D2-4E80-A68C-9CC451708825}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4F4788E9-C9D2-4E80-A68C-9CC451708825}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4F4788E9-C9D2-4E80-A68C-9CC451708825}.Release|Any CPU.Build.0 = Release|Any CPU
+		{51467A66-95D9-4BF2-9EBB-43832E324E76}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{51467A66-95D9-4BF2-9EBB-43832E324E76}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{51467A66-95D9-4BF2-9EBB-43832E324E76}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{51467A66-95D9-4BF2-9EBB-43832E324E76}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
