@@ -22,12 +22,15 @@ namespace System.Runtime.CompilerServices
 
 namespace RankedChoiceServerless
 {
-    public class ElectionController
+    public static class ResponseExtensions 
     {
-        static APIGatewayProxyResponse toResponse(object obj, int statusCode = 200)
+        public static APIGatewayProxyResponse toResponse(this object obj, int statusCode = 200)
         {
             return new APIGatewayProxyResponse() { Body = JsonConvert.SerializeObject(obj) , StatusCode = statusCode};
-        }
+        }     
+    }
+    public class ElectionController
+    {
         
         public Task<APIGatewayProxyResponse> SubmitVote(APIGatewayProxyRequest apiProxyEvent, ILambdaContext context)
         {
@@ -35,12 +38,12 @@ namespace RankedChoiceServerless
             var userId = apiProxyEvent.Headers["userId"];
             var electionId = apiProxyEvent.PathParameters["electionId"];
             
-            var _repo = new ElectionRepository();
-            var election = _repo.Get(electionId);
+            var repo = new ElectionRepository();
+            var election = repo.Get(electionId);
             if (election == null)
             {
                 LambdaLogger.Log($"Election with Id {electionId} does not exist");
-                return Task.FromResult(toResponse(false, 404));
+                return Task.FromResult(false.toResponse(404));
             }
 
             List<Candidate> candidates = new List<Candidate>();
@@ -51,7 +54,7 @@ namespace RankedChoiceServerless
                 {
                     //That id is not valid, fail!
                     LambdaLogger.Log($"candidate with Id {candidateId} does not exist");
-                    return Task.FromResult(toResponse(false, 400));
+                    return Task.FromResult(false.toResponse(400));
                 }
                 
                 candidates.Add(candidate);
@@ -59,103 +62,111 @@ namespace RankedChoiceServerless
             
             election.AddVote(new Vote(userId, candidates.ToArray()));
 
-            return Task.FromResult(toResponse(true));
+            repo.Save(electionId, election);
+            
+            return Task.FromResult(true.toResponse());
         }
         
         public Task<APIGatewayProxyResponse> StartElection(APIGatewayProxyRequest apiProxyEvent, ILambdaContext context)
         {
             var electionId = apiProxyEvent.PathParameters["electionId"];
             
-            var _repo = new ElectionRepository();
-            var election = _repo.Get(electionId);
+            var repo = new ElectionRepository();
+            var election = repo.Get(electionId);
             if (election == null)
             {
                 LambdaLogger.Log($"Election with Id {electionId} does not exist");
-                return Task.FromResult(toResponse(false, 404));
+                return Task.FromResult(false.toResponse(404));
             } 
             var result = election.StartElection();
-            return Task.FromResult(toResponse(result));
+            repo.Save(electionId, election);
+            
+            return Task.FromResult(result.toResponse());
         }
         
         public Task<APIGatewayProxyResponse> EndElection(APIGatewayProxyRequest apiProxyEvent, ILambdaContext context)
         {
             var electionId = apiProxyEvent.PathParameters["electionId"];
-            var _repo = new ElectionRepository();
-            var election = _repo.Get(electionId);
+            var repo = new ElectionRepository();
+            var election = repo.Get(electionId);
             if (election == null)
             {
                 LambdaLogger.Log($"Election with Id {electionId} does not exist");
-                return Task.FromResult(toResponse(false, 404));
+                return Task.FromResult(false.toResponse(404));
             }
             var result = election.StopElection();
-            return Task.FromResult(toResponse(result));
+            repo.Save(electionId, election);
+            
+            return Task.FromResult(result.toResponse());
         }
         
         public Task<APIGatewayProxyResponse> RestartElection(APIGatewayProxyRequest apiProxyEvent, ILambdaContext context)
         {
             var electionId = apiProxyEvent.PathParameters["electionId"];
-            var _repo = new ElectionRepository();
-            var election = _repo.Get(electionId);
+            var repo = new ElectionRepository();
+            var election = repo.Get(electionId);
             if (election == null)
             {
                 LambdaLogger.Log($"Election with Id {electionId} does not exist");
-                return Task.FromResult(toResponse(false, 404));
+                return Task.FromResult(false.toResponse(404));
             }
             var result = election.RestartElection();
-            return Task.FromResult(toResponse(result));
+            repo.Save(electionId, election);
+            
+            return Task.FromResult(result.toResponse());
         }
         
         public Task<APIGatewayProxyResponse> GetElectionResults(APIGatewayProxyRequest apiProxyEvent, ILambdaContext context)
         {
             var electionId = apiProxyEvent.PathParameters["electionId"];
-            var _repo = new ElectionRepository();
-            var election = _repo.Get(electionId);
+            var repo = new ElectionRepository();
+            var election = repo.Get(electionId);
             if (election == null)
             {
                 LambdaLogger.Log($"Election with Id {electionId} does not exist");
-                return Task.FromResult(toResponse("", 404));
+                return Task.FromResult("".toResponse(404));
             }
             var result = new ElectionDTO(electionId, 
                 election.CalculateResults().Select(c => new CandidateDTO(c.value, c.candidateId)).ToArray());
             
-            return Task.FromResult(toResponse(result));
+            return Task.FromResult(result.toResponse());
         }
         
         public Task<APIGatewayProxyResponse> GetSettings(APIGatewayProxyRequest apiProxyEvent, ILambdaContext context)
         {
             var electionId = apiProxyEvent.PathParameters["electionId"];
-            var _repo = new ElectionRepository();
-            var election = _repo.Get(electionId);
+            var repo = new ElectionRepository();
+            var election = repo.Get(electionId);
             if (election == null)
             {
                 LambdaLogger.Log($"Election with Id {electionId} does not exist");
-                return Task.FromResult(toResponse("", 404));
+                return Task.FromResult("".toResponse(404));
             } 
             var result = new ElectionSettingsDTO(electionId, election.UniqueIdsPerUser, 
                 election.UniqueElectionIds.ToArray(), election.Users.Select(u => u.email).ToArray(), election.State);
             
-            return Task.FromResult(toResponse(result));
+            return Task.FromResult(result.toResponse());
         }
         
         public Task<APIGatewayProxyResponse> GetCandidates(APIGatewayProxyRequest apiProxyEvent, ILambdaContext context)
         {
             var electionId = apiProxyEvent.PathParameters["electionId"];
             
-            var _repo = new ElectionRepository();
-            var election = _repo.Get(electionId);
+            var repo = new ElectionRepository();
+            var election = repo.Get(electionId);
             if (election == null)
             {
-                election = _repo.GetByUniqueUserId(electionId);
+                election = repo.GetByUniqueUserId(electionId);
                 if (election == null)
                 {
                     LambdaLogger.Log($"Election with Id {electionId} does not exist");
-                    return Task.FromResult(toResponse("", 404));
+                    return Task.FromResult("".toResponse(404));
                 }
 
                 if (!election.UniqueIdsPerUser)
                 {
                     LambdaLogger.Log($"Attempting to get election with Id {election.ElectionId} by unique Id {electionId} failed, because UniqueIdesPerUser is not enabled");
-                    return Task.FromResult(toResponse("", 404));
+                    return Task.FromResult("".toResponse(404));
                 }
             } 
             
@@ -163,7 +174,7 @@ namespace RankedChoiceServerless
                 election.Candidates.Select(c => 
                     new CandidateDTO(c.value, c.candidateId)).ToArray()
                 );
-            return Task.FromResult(toResponse(result));
+            return Task.FromResult(result.toResponse());
         }
 
         public Task<APIGatewayProxyResponse> SaveSettings(APIGatewayProxyRequest apiProxyEvent, ILambdaContext context)
@@ -171,30 +182,30 @@ namespace RankedChoiceServerless
             var electionId = apiProxyEvent.PathParameters["electionId"];
             var settings = JsonConvert.DeserializeObject<ElectionSettingsDTO>(apiProxyEvent.Body); 
             
-            var _repo = new ElectionRepository();
+            var repo = new ElectionRepository();
             if (electionId != settings.electionId)
             {
                 LambdaLogger.Log($"ElectionId mismatch {electionId} {settings.electionId}");
-                return Task.FromResult(toResponse(false, 400));
+                return Task.FromResult(false.toResponse(400));
             }
             
-            if (!_repo.Exists(electionId))
+            if (!repo.Exists(electionId))
             {
-                _repo.Create(electionId);
+                repo.Create(electionId);
                 LambdaLogger.Log($"New election created with Id {electionId}");
             }
             
-            var election = _repo.Get(electionId);
+            var election = repo.Get(electionId);
             if (election == null)
             {
                 LambdaLogger.Log($"Election with Id {electionId} does not exist");
-                return Task.FromResult(toResponse(false, 404));
+                return Task.FromResult(false.toResponse(404));
             }
             election.SetUserEmails(settings.userEmails);
-            election.UniqueIdsPerUser = settings.uniqueIdsPerUser;
+            election.SaveSettings(settings.uniqueIdsPerUser, "");
 
-            _repo.Save(electionId, election);
-            return Task.FromResult(toResponse(true));
+            repo.Save(electionId, election);
+            return Task.FromResult(true.toResponse());
         }
         
         public Task<APIGatewayProxyResponse> SaveCandidates(APIGatewayProxyRequest apiProxyEvent, ILambdaContext context)
@@ -202,33 +213,34 @@ namespace RankedChoiceServerless
             var electionId = apiProxyEvent.PathParameters["electionId"];
             var dto = JsonConvert.DeserializeObject<ElectionDTO>(apiProxyEvent.Body); 
             
-            var _repo = new ElectionRepository();
+            var repo = new ElectionRepository();
             if (electionId != dto.electionId)
             {
                 LambdaLogger.Log($"ElectionId mismatch {electionId} {dto.electionId}");
-                return Task.FromResult(toResponse(false, 400));
+                return Task.FromResult(false.toResponse(400));
             }
 
-            if (!_repo.Exists(electionId))
+            if (!repo.Exists(electionId))
             {
                 LambdaLogger.Log($"New election created with Id {electionId}");
-                _repo.Create(electionId);
+                repo.Create(electionId);
             }
             
             LambdaLogger.Log($"Election with Id {electionId} Saved");
 
-            var election = _repo.Get(electionId);
+            var election = repo.Get(electionId);
             if (election == null)
             {
                 LambdaLogger.Log($"Election with Id {electionId} does not exist");
-                return Task.FromResult(toResponse(false, 404));
+                return Task.FromResult(false.toResponse(404));
             }
             var candidates = dto.candidates.Select(c => new Candidate(c.value, c.candidateId)).ToArray();
-            election.Candidates = candidates;
             
-            _repo.Save(electionId, election);
+            election.SaveCandidates(candidates);
             
-            return Task.FromResult(toResponse(true));
+            repo.Save(electionId, election);
+            
+            return Task.FromResult(true.toResponse());
         }
     }
 }

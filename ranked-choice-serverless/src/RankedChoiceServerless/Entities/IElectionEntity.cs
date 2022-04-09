@@ -13,22 +13,26 @@ namespace RankedChoiceServices.Entities
     {
         public string ElectionId { get; }
         
+        //Query
         //TODO: Doesn't include metadata, like dates, and users, etc. 
         public IReadOnlyList<IReadOnlyList<Candidate>> History { get; }
-        public IReadOnlyList<Candidate> Candidates { get; set;  }
+        public IReadOnlyList<Candidate> Candidates { get; }
         public IReadOnlyList<User> Users { get; }
         public IReadOnlyList<Vote> Votes { get; }
         public IEnumerable<string> UniqueElectionIds { get; }
-        public bool UniqueIdsPerUser { get; set; }
+        public bool UniqueIdsPerUser { get; }
         
         public ElectionState State { get; }
+        public IEnumerable<Candidate> CalculateResults();
 
+        //Commands
+        public bool SaveCandidates(IEnumerable<Candidate> candidates);
         public bool AddVote(Vote vote);
         public bool StartElection();
         public bool StopElection();
         public bool RestartElection();
+        public bool SaveSettings(bool uniqueIdsPerUser, string electionName);
         
         public bool SetUserEmails(string[] emails);
-        public IEnumerable<Candidate> CalculateResults();
     }
 }

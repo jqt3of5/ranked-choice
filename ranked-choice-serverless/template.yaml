@@ -9,7 +9,7 @@ Globals:
     Timeout: 10
 
 Resources:
-  SubmitVoteFunction:
+  AddVoteFunction:
     Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
     Properties:
       CodeUri: ./src/RankedChoiceServerless/
@@ -67,7 +67,7 @@ Resources:
         RankedChoice:
           Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
           Properties:
-            Path: /election/{electionId}/end
+            Path: /election/{electionId}/restart
             Method: post
   GetElectionResultsFunction:
     Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
@@ -144,16 +144,61 @@ Resources:
           Properties:
             Path: /election/{electionId}/candidates
             Method: post 
+  SaveVoteFunction:
+    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Properties:
+      CodeUri: ./src/RankedChoiceServerless/
+      Handler: RankedChoiceServerless::RankedChoiceServerless.VoteController::SaveCandidates
+      Runtime: dotnetcore3.1
+      Environment: # More info about Env Vars: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#environment-object
+        Variables:
+          PARAM1: VALUE
+      Events:
+        RankedChoice:
+          Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
+          Properties:
+            Path: /vote/{electionId}
+            Method: post
+  GetVoteFunction:
+    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Properties:
+      CodeUri: ./src/RankedChoiceServerless/
+      Handler: RankedChoiceServerless::RankedChoiceServerless.VoteController::GetCandidates
+      Runtime: dotnetcore3.1
+      Environment: # More info about Env Vars: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#environment-object
+        Variables:
+          PARAM1: VALUE
+      Events:
+        RankedChoice:
+          Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
+          Properties:
+            Path: /vote/{electionId}
+            Method: get 
+  SubmitVoteFunction:
+    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Properties:
+      CodeUri: ./src/RankedChoiceServerless/
+      Handler: RankedChoiceServerless::RankedChoiceServerless.VoteController::SubmitVote
+      Runtime: dotnetcore3.1
+      Environment: # More info about Env Vars: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#environment-object
+        Variables:
+          PARAM1: VALUE
+      Events:
+        RankedChoice:
+          Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
+          Properties:
+            Path: /vote/{electionId}/submit
+            Method: post 
 Outputs:
   # ServerlessRestApi is an implicit API created out of Events key under Serverless::Function
   # Find out more about other implicit resources you can reference within SAM
   # https://github.com/awslabs/serverless-application-model/blob/master/docs/internals/generated_resources.rst#api
   RankedChoiceServerlessApi:
     Description: "API Gateway endpoint URL for Prod stage for Hello World function"
-    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/hello/"
-  RankedChoiceServerlessFunction:
-    Description: "Hello World Lambda Function ARN"
-    Value: !GetAtt RankedChoiceServerlessFunction.Arn
-  RankedChoiceServerlessFunctionIamRole:
-    Description: "Implicit IAM Role created for Hello World function"
-    Value: !GetAtt RankedChoiceServerlessFunctionRole.Arn
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/"
+#  RankedChoiceServerlessFunction:
+#    Description: "Hello World Lambda Function ARN"
+#    Value: !GetAtt RankedChoiceServerlessFunction.Arn
+#  RankedChoiceServerlessFunctionIamRole:
+#    Description: "Implicit IAM Role created for Hello World function"
+#    Value: !GetAtt RankedChoiceServerlessFunctionRole.Arn

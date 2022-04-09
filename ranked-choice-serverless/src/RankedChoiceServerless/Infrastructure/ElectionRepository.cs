@@ -27,7 +27,7 @@ namespace RankedChoiceServices.Entities
 
         public IElection Create(string electionId)
         {
-            var election = new ElectionEntity(electionId);
+            var election = new ElectionEntity(electionId, new ElectionEntity.IElectionEvent[]{}); 
             _elections[electionId] = election;
             return election;
         }
