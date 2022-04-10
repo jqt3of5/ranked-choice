@@ -13,7 +13,7 @@ namespace RankedChoiceServices.Entities
 
         public VoteEntity Create(string userId, string electionId)
         {
-            var entity = new VoteEntity(userId, electionId);
+            var entity = new VoteEntity(userId, electionId, new VoteEntity.IVoteEntityEvent[] {});
             
             _dictionary[userId + electionId] = entity;
             
@@ -21,7 +21,7 @@ namespace RankedChoiceServices.Entities
         }
         public VoteEntity? GetForUser(string userId, string electionId)
         {
-            if (_dictionary.TryGetValue(userId+electionId, out var entity))
+            if (_dictionary.TryGetValue(userId + electionId, out var entity))
             {
                 return entity;
             }
@@ -32,7 +32,7 @@ namespace RankedChoiceServices.Entities
       
         public bool SaveForUser(string userId, string electionId, VoteEntity entity)
         {
-            _dictionary[userId+electionId] = entity;
+            _dictionary[userId + electionId] = entity;
             return true;
         }
         

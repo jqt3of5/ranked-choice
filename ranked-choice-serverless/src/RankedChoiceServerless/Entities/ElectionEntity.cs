@@ -9,19 +9,23 @@ namespace RankedChoiceServices.Entities
     {
         public interface IElectionEvent
         {
-            string ElectionId { get; }
+            DateTime EventTime { get; }
         }
-        public record SaveCandidatesEvent(string ElectionId, Candidate[] Candidates) : IElectionEvent;
-        public record SaveSettingsEvent(string ElectionId, (bool uniqueIdPerUser, string electionName) settings) : IElectionEvent;
-        public record SaveUserEmailsEvent(string ElectionId, string[] Emails) : IElectionEvent;
-        public record SubmitVoteEvent(string ElectionId, Vote Vote) : IElectionEvent;
-        public record StartElectionEvent(string ElectionId) : IElectionEvent;
-        public record RestartElectionEvent(string ElectionId) : IElectionEvent;
-        public record EndElectionEvent(string ElectionId) : IElectionEvent;
+        
+        public record SaveCandidatesEvent(DateTime EventTime, Candidate[] Candidates) : IElectionEvent;
+        public record SaveSettingsEvent(DateTime EventTime,(bool uniqueIdPerUser, string electionName) Settings) : IElectionEvent;
+        public record SaveUserEmailsEvent(DateTime EventTime, string[] Emails) : IElectionEvent;
+        public record SubmitVoteEvent(DateTime EventTime, Vote Vote) : IElectionEvent;
+
+        public record CreateElectionEvent(DateTime EventTime, string OwnerUserId) : IElectionEvent;
+        public record StartElectionEvent(DateTime EventTime) : IElectionEvent;
+        public record RestartElectionEvent(DateTime EventTime) : IElectionEvent;
+        public record EndElectionEvent(DateTime EventTime) : IElectionEvent;
         public Stack<IElectionEvent> Events { get; }
         
         
         public string ElectionId { get; private set; }
+        public string OwnerUserId { get; private set; }
 
         private List<IReadOnlyList<Candidate>> _history = new();
         public IReadOnlyList<IReadOnlyList<Candidate>> History => _history; 
@@ -35,8 +39,7 @@ namespace RankedChoiceServices.Entities
         private List<User> _users = new();
         public IReadOnlyList<User> Users => _users;
 
-        public IEnumerable<string> UniqueElectionIds =>
-            UniqueIdsPerUser ? Users.Select(u => u.userId) : new List<string>();
+        public IEnumerable<string> UniqueElectionIds => _users.Select(u => u.userId);
 
         public bool UniqueIdsPerUser
         {
@@ -78,10 +81,23 @@ namespace RankedChoiceServices.Entities
             return _candidates;
         }
 
+        public ElectionEntity(string electionId, string ownerUserId)
+        {
+            ElectionId = electionId;
+            OwnerUserId = string.Empty;
+            Events = new Stack<IElectionEvent>();
+
+            Dispatch(new CreateElectionEvent(DateTime.Now, ownerUserId));
+        }
         public ElectionEntity(string electionId, IEnumerable<IElectionEvent> events)
         {
             ElectionId = electionId;
+            OwnerUserId = string.Empty;
             Events = new Stack<IElectionEvent>(events);
+            if (!events.Any())
+            {
+                throw new ArgumentException("events cannot be empty");
+            }
             foreach (var @event in Events)
             {
                 Reduce(@event);
@@ -101,7 +117,11 @@ namespace RankedChoiceServices.Entities
                     _candidates.AddRange(e.Candidates); 
                     return true;
                 case SaveSettingsEvent e:
-                    UniqueIdsPerUser = e.settings.uniqueIdPerUser;
+                    if (State != ElectionState.New)
+                    {
+                        return false;
+                    }
+                    UniqueIdsPerUser = e.Settings.uniqueIdPerUser;
                     
                     return true;
                 case SaveUserEmailsEvent e:
@@ -111,15 +131,18 @@ namespace RankedChoiceServices.Entities
                         return false;
                     }
 
+                    //We need to generate guids for new users, but not existing ones.
                     //Do a diff, and find the added emails
-                    var added = e.Emails.Where(e => _users.All(u => u.email != e));
+                    var added = e.Emails.Where(e => _users.All(u => u.email != e)).Select(e => new User(e)).ToList();
             
-                    //concat the new ones onto thelist
+                    //concat the new ones onto the list, and maintain a specific order since we have parallel arrays
                     var users = _users
                         .Where(u => e.Emails.Any(e => e == u.email))
-                        .Concat(added.Select(e => new User(e, new Guid().ToString())));
+                        .Concat(added);
             
+                    _users.Clear();
                     _users.AddRange(users);
+
                     return true;
                 case SubmitVoteEvent e:
                     //Finished and New elections can't have votes added to them
@@ -133,6 +156,14 @@ namespace RankedChoiceServices.Entities
                     }
 
                     _votes.Add(e.Vote);
+                    return true;
+                case CreateElectionEvent e:
+                    if (!string.IsNullOrEmpty(OwnerUserId))
+                    {
+                        return false;
+                    }
+                    OwnerUserId = e.OwnerUserId;
+                    State = ElectionState.New;
                     return true;
                 case StartElectionEvent e:
                     switch (State)
@@ -184,36 +215,36 @@ namespace RankedChoiceServices.Entities
 
         public bool SaveCandidates(IEnumerable<Candidate> candidates)
         {
-            return Dispatch(new SaveCandidatesEvent(ElectionId, candidates.ToArray()));
+            return Dispatch(new SaveCandidatesEvent(DateTime.Now, candidates.ToArray()));
         }
         public bool StartElection()
         {
-            return Dispatch(new StartElectionEvent(ElectionId));
+            return Dispatch(new StartElectionEvent(DateTime.Now));
         }
 
         public bool StopElection()
         {
-            return Dispatch(new EndElectionEvent(ElectionId));
+            return Dispatch(new EndElectionEvent(DateTime.Now));
         }
         
         public bool RestartElection()
         {
-            return Dispatch(new RestartElectionEvent(ElectionId));
+            return Dispatch(new RestartElectionEvent(DateTime.Now));
         }
 
         public bool SetUserEmails(string[] emails)
         {
-            return Dispatch(new SaveUserEmailsEvent(ElectionId, emails));
+            return Dispatch(new SaveUserEmailsEvent(DateTime.Now, emails));
         }
 
         public bool AddVote(Vote vote)
         {
-            return Dispatch(new SubmitVoteEvent(ElectionId, vote));
+            return Dispatch(new SubmitVoteEvent(DateTime.Now, vote));
         }
 
         public bool SaveSettings(bool uniqueIdsPerUser, string electionName)
         {
-            return Dispatch(new SaveSettingsEvent(ElectionId, (uniqueIdsPerUser, electionName)));
+            return Dispatch(new SaveSettingsEvent(DateTime.Now, (uniqueIdsPerUser, electionName)));
         }
     }
 }

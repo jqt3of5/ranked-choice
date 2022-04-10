@@ -180,6 +180,7 @@ namespace RankedChoiceServerless
         public Task<APIGatewayProxyResponse> SaveSettings(APIGatewayProxyRequest apiProxyEvent, ILambdaContext context)
         {
             var electionId = apiProxyEvent.PathParameters["electionId"];
+            var userId = apiProxyEvent.Headers["userId"];
             var settings = JsonConvert.DeserializeObject<ElectionSettingsDTO>(apiProxyEvent.Body); 
             
             var repo = new ElectionRepository();
@@ -191,7 +192,7 @@ namespace RankedChoiceServerless
             
             if (!repo.Exists(electionId))
             {
-                repo.Create(electionId);
+                repo.Create(electionId, userId);
                 LambdaLogger.Log($"New election created with Id {electionId}");
             }
             
@@ -211,6 +212,7 @@ namespace RankedChoiceServerless
         public Task<APIGatewayProxyResponse> SaveCandidates(APIGatewayProxyRequest apiProxyEvent, ILambdaContext context)
         {
             var electionId = apiProxyEvent.PathParameters["electionId"];
+            var userId = apiProxyEvent.Headers["userId"];
             var dto = JsonConvert.DeserializeObject<ElectionDTO>(apiProxyEvent.Body); 
             
             var repo = new ElectionRepository();
@@ -223,7 +225,7 @@ namespace RankedChoiceServerless
             if (!repo.Exists(electionId))
             {
                 LambdaLogger.Log($"New election created with Id {electionId}");
-                repo.Create(electionId);
+                repo.Create(electionId, userId);
             }
             
             LambdaLogger.Log($"Election with Id {electionId} Saved");

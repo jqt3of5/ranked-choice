@@ -6,7 +6,11 @@ namespace RankedChoiceServices.Entities
     {
         public string UserId { get; }
         public string ElectionId { get; }
-        public IReadOnlyList<Candidate> Candidates { get; set; } 
-        public bool Submitted { get; set; }
+        public IReadOnlyList<Candidate> Candidates { get; } 
+        public bool Submitted { get; }
+
+
+        public bool SaveVote(Candidate[] candidates);
+        public bool SubmitVote();
     }
 }

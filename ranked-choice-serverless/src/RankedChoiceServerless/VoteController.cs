@@ -22,16 +22,19 @@ namespace HelloWorld
             var entity = voteRepository.GetForUser(userId, electionId);
             if (entity == null)
             {
-                LambdaLogger.Log($"Vote for user {userId} for election {electionId}");
+                LambdaLogger.Log($"Vote for user {userId} for election {electionId} created");
                 entity = voteRepository.Create(userId, electionId);
             }
 
-            if (entity.Submitted == true)
+            if (entity.Submitted)
             {
+                LambdaLogger.Log($"Vote for user {userId} for election {electionId} not saved because it has already been submitted");
                 return Task.FromResult(false.toResponse(400));
             }
 
-            entity.Candidates = vote.candidates.Select(c => new Candidate(c.value, c.candidateId)).ToList();
+            var candidates = vote.candidates.Select(c => new Candidate(c.value, c.candidateId)).ToArray();
+
+            entity.SaveVote(candidates);
              
             voteRepository.SaveForUser(userId, electionId, entity);
 
@@ -70,7 +73,12 @@ namespace HelloWorld
                 return Task.FromResult(false.toResponse(404));
             }
 
-            entity.Submitted = true;
+            if (entity.Submitted)
+            {
+                LambdaLogger.Log($"Vote for user {userId} for election {electionId} not saved because it has already been submitted");
+                return Task.FromResult(false.toResponse(400));
+            }
+            entity.SubmitVote();
 
             voteRepository.SaveForUser(userId, electionId, entity);
 

@@ -13,9 +13,9 @@ namespace RankedChoiceServices.Entities
             if (election is ElectionEntity entity)
             {
                 _elections[electionId] = entity;
-                foreach (var user in election.Users)
+                foreach (var userId in election.UniqueElectionIds)
                 {
-                    _usersIndex[user.userId] = entity;
+                    _usersIndex[userId] = entity;
                 }
             }
         }
@@ -25,9 +25,9 @@ namespace RankedChoiceServices.Entities
             return _elections.ContainsKey(electionId);
         }
 
-        public IElection Create(string electionId)
+        public IElection Create(string electionId, string ownerUserId)
         {
-            var election = new ElectionEntity(electionId, new ElectionEntity.IElectionEvent[]{}); 
+            var election = new ElectionEntity(electionId, ownerUserId);
             _elections[electionId] = election;
             return election;
         }
