@@ -14,7 +14,8 @@ namespace RankedChoiceServices.Entities
         
         public record SaveCandidatesEvent(DateTime EventTime, Candidate[] Candidates) : IElectionEvent;
         public record SaveSettingsEvent(DateTime EventTime,(bool uniqueIdPerUser, string electionName) Settings) : IElectionEvent;
-        public record SaveUserEmailsEvent(DateTime EventTime, (string email, string userId) [] Users) : IElectionEvent;
+        public record AddUserEmailsEvent(DateTime EventTime, (string email, string userId) [] Users) : IElectionEvent;
+        public record RemoveUserEmailsEvent(DateTime EventTime, string [] Emails) : IElectionEvent;
         public record SubmitVoteEvent(DateTime EventTime, Vote Vote) : IElectionEvent;
 
         public record CreateElectionEvent(DateTime EventTime, string OwnerUserId) : IElectionEvent;
@@ -125,12 +126,21 @@ namespace RankedChoiceServices.Entities
                     UniqueIdsPerUser = e.Settings.uniqueIdPerUser;
                     
                     return true;
-                case SaveUserEmailsEvent e:
-                    //Can't add users to a finished election
+                case RemoveUserEmailsEvent e:
+                    //Can't remove users from a finished election
                     if (State == ElectionState.Finished)
                     {
                         return false;
                     }
+                    //TODO:
+                    return true;
+                case AddUserEmailsEvent e:
+                    //Can't add users to a finished election
+                    if (State == ElectionState.Finished)
+                    {
+                        return false;
+                    } 
+                    //TODO:
 
                     //We need to generate guids for new users, but not existing ones.
                     //Do a diff, and find the added emails
