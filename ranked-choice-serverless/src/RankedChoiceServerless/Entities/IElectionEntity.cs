@@ -33,6 +33,6 @@ namespace RankedChoiceServices.Entities
         public bool RestartElection();
         public bool SaveSettings(bool uniqueIdsPerUser, string electionName);
         
-        public bool SetUserEmails(string[] emails);
+        public bool SetUserEmails((string email, string userId) [] users);
     }
 }
