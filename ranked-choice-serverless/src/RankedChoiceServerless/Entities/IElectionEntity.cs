@@ -5,7 +5,7 @@ namespace RankedChoiceServices.Entities
 {
     public record Candidate(string value, string candidateId);
 
-    public record User(string email, string userId);
+    public record User(string email);
 
     public record Vote(string userId, Candidate [] candidates);
 
@@ -19,7 +19,6 @@ namespace RankedChoiceServices.Entities
         public IReadOnlyList<Candidate> Candidates { get; }
         public IReadOnlyList<User> Users { get; }
         public IReadOnlyList<Vote> Votes { get; }
-        public IEnumerable<string> UniqueElectionIds { get; }
         public bool UniqueIdsPerUser { get; }
         
         public ElectionState State { get; }
@@ -32,8 +31,6 @@ namespace RankedChoiceServices.Entities
         public bool StopElection();
         public bool RestartElection();
         public bool SaveSettings(bool uniqueIdsPerUser, string electionName);
-        
-        public bool AddUserEmails((string email, string userId) [] users);
-        public bool RemoveUserEmails(string [] email);
+        public bool SetUserEmails(string [] email);
     }
 }

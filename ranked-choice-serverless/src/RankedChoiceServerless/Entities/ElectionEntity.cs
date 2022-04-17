@@ -14,8 +14,7 @@ namespace RankedChoiceServices.Entities
         
         public record SaveCandidatesEvent(DateTime EventTime, Candidate[] Candidates) : IElectionEvent;
         public record SaveSettingsEvent(DateTime EventTime,(bool uniqueIdPerUser, string electionName) Settings) : IElectionEvent;
-        public record AddUserEmailsEvent(DateTime EventTime, (string email, string userId) [] Users) : IElectionEvent;
-        public record RemoveUserEmailsEvent(DateTime EventTime, string [] Emails) : IElectionEvent;
+        public record SaveUserEmailsEvent(DateTime EventTime, string [] Emails) : IElectionEvent;
         public record SubmitVoteEvent(DateTime EventTime, Vote Vote) : IElectionEvent;
 
         public record CreateElectionEvent(DateTime EventTime, string OwnerUserId) : IElectionEvent;
@@ -40,8 +39,6 @@ namespace RankedChoiceServices.Entities
         private List<User> _users = new();
         private IElection _electionImplementation;
         public IReadOnlyList<User> Users => _users;
-
-        public IEnumerable<string> UniqueElectionIds => _users.Select(u => u.userId);
 
         public bool UniqueIdsPerUser
         {
@@ -126,33 +123,14 @@ namespace RankedChoiceServices.Entities
                     UniqueIdsPerUser = e.Settings.uniqueIdPerUser;
                     
                     return true;
-                case RemoveUserEmailsEvent e:
-                    //Can't remove users from a finished election
-                    if (State == ElectionState.Finished)
-                    {
-                        return false;
-                    }
-                    //TODO:
-                    return true;
-                case AddUserEmailsEvent e:
+                case SaveUserEmailsEvent e:
                     //Can't add users to a finished election
                     if (State == ElectionState.Finished)
                     {
                         return false;
                     } 
-                    //TODO:
-
-                    //We need to generate guids for new users, but not existing ones.
-                    //Do a diff, and find the added emails
-                    var added = e.Users.Where(e => _users.All(u => u.email != e.email)).Select(e => new User(e.email, e.userId)).ToList();
-            
-                    //concat the new ones onto the list, and maintain a specific order since we have parallel arrays
-                    var users = _users
-                        .Where(u => e.Users.Any(e => e.email == u.email))
-                        .Concat(added);
-            
                     _users.Clear();
-                    _users.AddRange(users);
+                    _users.AddRange(e.Emails.Select(e => new User(e)));
 
                     return true;
                 case SubmitVoteEvent e:
@@ -243,9 +221,9 @@ namespace RankedChoiceServices.Entities
             return Dispatch(new RestartElectionEvent(DateTime.Now));
         }
 
-        public bool SetUserEmails((string email, string userId) [] users)
+        public bool SetUserEmails(string [] emails)
         {
-            return Dispatch(new SaveUserEmailsEvent(DateTime.Now, users));
+            return Dispatch(new SaveUserEmailsEvent(DateTime.Now, emails));
         }
 
         public bool AddVote(Vote vote)

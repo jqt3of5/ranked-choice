@@ -142,8 +142,7 @@ namespace RankedChoiceServerless
                 LambdaLogger.Log($"Election with Id {electionId} does not exist");
                 return Task.FromResult("".toResponse(404));
             } 
-            var result = new ElectionSettingsDTO(electionId, election.UniqueIdsPerUser, 
-                election.UniqueElectionIds.ToArray(), election.Users.Select(u => u.email).ToArray(), election.State);
+            var result = new ElectionSettingsDTO(electionId, election.UniqueIdsPerUser, election.Users.Select(u => u.email).ToArray(), election.State);
             
             return Task.FromResult(result.toResponse());
         }
@@ -202,8 +201,9 @@ namespace RankedChoiceServerless
                 LambdaLogger.Log($"Election with Id {electionId} does not exist");
                 return Task.FromResult(false.toResponse(404));
             }
+            
             election.SetUserEmails(settings.userEmails);
-            election.SaveSettings(settings.uniqueIdsPerUser, "");
+            election.SaveSettings(settings.uniqueIdsPerUser, "My Election");
 
             repo.Save(electionId, election);
             return Task.FromResult(true.toResponse());
