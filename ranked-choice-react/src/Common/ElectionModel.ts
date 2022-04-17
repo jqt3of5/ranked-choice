@@ -1,5 +1,10 @@
 import {ElectionDTO, ElectionSettingsDTO} from "./Data";
 
+export function createElection(userId : string) : Promise<string>
+{
+    return fetch(`${process.env.REACT_APP_API}/election/`, {method:"POST"})
+        .then(res => res.json().then(res => res as string))
+}
 export function getElectionCandidates(electionId : string, userId : string) : Promise<ElectionDTO>
 {
     return fetch(`${process.env.REACT_APP_API}/election/${electionId}/candidates`)

@@ -1,6 +1,6 @@
 import React, {useEffect, useReducer} from 'react';
 import {Column} from '../Components/Column';
-import './CreateElectionView.css'
+import './ElectionAdminView.css'
 import '../Common/common.css'
 import {CardTableActionType, card_table_reducer} from "./CardTableReducer";
 import {CandidateDTO, ElectionDTO} from "../Common/Data";
@@ -12,7 +12,7 @@ import {BiDuplicate} from "react-icons/bi";
 import {CardTable} from "../Components/Table";
 import {getElectionCandidates, saveElectionCandidates} from "../Common/ElectionModel";
 
-export function CreateElectionView() {
+export function ElectionAdminView() {
     var [state, dispatch] = useReducer(card_table_reducer, {
         table: [[],[]]
     })

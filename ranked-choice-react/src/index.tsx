@@ -3,17 +3,19 @@ import ReactDOM from 'react-dom';
 import './index.css';
 import reportWebVitals from './reportWebVitals';
 import {BrowserRouter, Route, Routes} from "react-router-dom";
-import {CreateElectionView} from "./Views/CreateElectionView";
+import {ElectionAdminView} from "./Views/ElectionAdminView";
 import {VoteView} from "./Views/VoteView";
 import { LandingPage } from './Views/LandingPage';
 
+
 ReactDOM.render(
+
   <React.StrictMode>
       <BrowserRouter>
           <Routes>
               <Route path="/" element={<LandingPage/>}/>
               <Route path="vote/:electionId" element={<VoteView />}/>
-              <Route path="election/:electionId" element={<CreateElectionView/>}/>
+              <Route path="election/:electionId" element={<ElectionAdminView/>}/>
           </Routes>
       </BrowserRouter>
   </React.StrictMode>,

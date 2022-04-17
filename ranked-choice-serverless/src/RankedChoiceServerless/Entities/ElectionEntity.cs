@@ -23,7 +23,6 @@ namespace RankedChoiceServices.Entities
         public record EndElectionEvent(DateTime EventTime) : IElectionEvent;
         public Stack<IElectionEvent> Events { get; }
         
-        
         public string ElectionId { get; private set; }
         public string OwnerUserId { get; private set; }
 

@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -31,7 +32,17 @@ namespace RankedChoiceServerless
     }
     public class ElectionController
     {
-        
+        public Task<APIGatewayProxyResponse> CreateElection(APIGatewayProxyRequest apiProxyEvent,
+            ILambdaContext context)
+        {
+            var userId = apiProxyEvent.Headers["userId"];
+            var repo = new ElectionRepository();
+            var electionId = new Guid().ToString();
+            var election = repo.Create(electionId, userId);
+
+            return Task.FromResult(electionId.toResponse());
+        }
+
         public Task<APIGatewayProxyResponse> SubmitVote(APIGatewayProxyRequest apiProxyEvent, ILambdaContext context)
         {
             string[] candidateIds = JsonConvert.DeserializeObject<string[]>(apiProxyEvent.Body);

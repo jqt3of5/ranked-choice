@@ -13,10 +13,6 @@ namespace RankedChoiceServices.Entities
             if (election is ElectionEntity entity)
             {
                 _elections[electionId] = entity;
-                // foreach (var userId in election.UniqueElectionIds)
-                // {
-                    // _usersIndex[userId] = entity;
-                // }
             }
         }
 
