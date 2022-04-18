@@ -8,15 +8,17 @@ namespace RankedChoiceServices.Entities
 {
     public class ElectionRepository
     {
-        public async void Save(string electionId, IElection election)
+        public async void Save(IElection election)
         {
-            //TODO: We shouldn't make this assumption. But there is a lot more work to be done here any way
-
             if (election is IEntity<IElectionEvent> entity)
             {
                 var client = new AmazonDynamoDBClient();
                 var table = Table.LoadTable(client, "ElectionData");
 
+                //TODO: When saving to dynamo db.... my events are poly morphic so I have a few options
+                //TODO: Does the sdk support that already? through the object persistence model?
+                //TODO: Should I store the object as json with type discriminators?
+                //TODO: Should I just store each different object in the table (with type discriminators) and do some custom deserialization?
                 foreach (var entityEvent in entity.Events)
                 {
                     var doc = new Document();

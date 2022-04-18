@@ -39,7 +39,9 @@ namespace RankedChoiceServerless
             var repo = new ElectionRepository();
             var electionId = new Guid().ToString();
             var election = repo.Create(electionId, userId);
-
+            
+            //TODO: Convert to anonymous classes (Or do I want explicit DTOs?):
+            // return Task.FromResult(new {electionId = electionId}.toResponse());
             return Task.FromResult(electionId.toResponse());
         }
 
@@ -73,7 +75,7 @@ namespace RankedChoiceServerless
             
             election.AddVote(new Vote(userId, candidates.ToArray()));
 
-            repo.Save(electionId, election);
+            repo.Save(election);
             
             return Task.FromResult(true.toResponse());
         }
@@ -90,7 +92,7 @@ namespace RankedChoiceServerless
                 return Task.FromResult(false.toResponse(404));
             } 
             var result = election.StartElection();
-            repo.Save(electionId, election);
+            repo.Save(election);
             
             return Task.FromResult(result.toResponse());
         }
@@ -106,7 +108,7 @@ namespace RankedChoiceServerless
                 return Task.FromResult(false.toResponse(404));
             }
             var result = election.StopElection();
-            repo.Save(electionId, election);
+            repo.Save(election);
             
             return Task.FromResult(result.toResponse());
         }
@@ -122,7 +124,7 @@ namespace RankedChoiceServerless
                 return Task.FromResult(false.toResponse(404));
             }
             var result = election.RestartElection();
-            repo.Save(electionId, election);
+            repo.Save(election);
             
             return Task.FromResult(result.toResponse());
         }
@@ -216,7 +218,7 @@ namespace RankedChoiceServerless
             election.SetUserEmails(settings.userEmails);
             election.SaveSettings(settings.uniqueIdsPerUser, "My Election");
 
-            repo.Save(electionId, election);
+            repo.Save(election);
             return Task.FromResult(true.toResponse());
         }
         
@@ -251,7 +253,7 @@ namespace RankedChoiceServerless
             
             election.SaveCandidates(candidates);
             
-            repo.Save(electionId, election);
+            repo.Save(election);
             
             return Task.FromResult(true.toResponse());
         }
