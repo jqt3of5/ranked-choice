@@ -1,32 +1,36 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Text.Json.Serialization;
+using System.Threading.Tasks;
 using Amazon.DynamoDBv2;
+using Amazon.DynamoDBv2.DataModel;
 using Amazon.DynamoDBv2.DocumentModel;
 using Newtonsoft.Json;
 
 namespace RankedChoiceServices.Entities
 {
-    public class ElectionRepository
+    public class ElectionRepository : EntityRepository
     {
+        public ElectionRepository()
+        {
+            var client = new AmazonDynamoDBClient();
+            ElectionTable = Table.LoadTable(client, "ElectionData");
+            Context = new DynamoDBContext(client);
+        }
+        
+        private Table ElectionTable { get; }
+        private DynamoDBContext Context{ get; }
+
         public async void Save(IElection election)
         {
             if (election is IEntity<IElectionEvent> entity)
             {
-                var client = new AmazonDynamoDBClient();
-                var table = Table.LoadTable(client, "ElectionData");
-
-                //TODO: When saving to dynamo db.... my events are poly morphic so I have a few options
-                //TODO: Does the sdk support that already? through the object persistence model?
-                //TODO: Should I store the object as json with type discriminators?
-                //TODO: Should I just store each different object in the table (with type discriminators) and do some custom deserialization?
                 foreach (var entityEvent in entity.Events)
                 {
-                    var doc = new Document();
-                    doc["Id"] = entityEvent.EventId;
-                    doc["ElectionId"] = entityEvent.ElectionId;
-                    doc["Time"] = entityEvent.EventTime.Ticks;
-                    doc["payload"] = JsonConvert.SerializeObject(entityEvent);
-                    await table.UpdateItemAsync(doc);
+                    var doc = Context.ToDocument(entityEvent);
+                    doc["Type"] = entityEvent.GetType().Name;
+                    await ElectionTable.UpdateItemAsync(doc);
                 }
             }
         }
@@ -53,11 +57,19 @@ namespace RankedChoiceServices.Entities
 
             return null;
         }
+
         public IElection? Get(string electionId)
         {
-            if (_elections.TryGetValue(electionId, out var election))
+            var filter = new ScanFilter();
+            filter.AddCondition("ElectionId", ScanOperator.Equal, electionId);
+            if (ElectionTable.Scan(filter) is { } search)
             {
-                return election;
+                var events = new List<IElectionEvent>();
+                foreach (var match in search.Matches)
+                {
+                    var e = Context.FromDocument<SaveCandidatesEvent>(match);
+                    events.Add(e);
+                }
             }
             
             return null;
