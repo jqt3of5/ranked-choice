@@ -7,9 +7,25 @@ Globals:
   Function:
     Timeout: 10
 Resources:
+  ElectionTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      AttributeDefinitions:
+      - AttributeName: EventId
+        AttributeType: S
+      KeySchema:
+      - AttributeName: EventId
+        KeyType: HASH
+      TableName: ElectionTable
+      ProvisionedThroughput:
+        ReadCapacityUnits: '5'
+        WriteCapacityUnits: '5'
   AddVoteFunction:
     Type: AWS::Serverless::Function
     Properties:
+      Policies:
+      - DynamoDBCrudPolicy:
+          TableName: ElectionTable
       CodeUri: AddVoteFunction
       Handler: RankedChoiceServerless::RankedChoiceServerless.ElectionController::SubmitVote
       Runtime: dotnetcore3.1
@@ -22,9 +38,30 @@ Resources:
           Properties:
             Path: /election/{electionId}/vote
             Method: post
+  CreateElectionFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Policies:
+      - DynamoDBCrudPolicy:
+          TableName: ElectionTable
+      CodeUri: CreateElectionFunction
+      Handler: RankedChoiceServerless::RankedChoiceServerless.ElectionController::CreateElection
+      Runtime: dotnetcore3.1
+      Environment:
+        Variables:
+          PARAM1: VALUE
+      Events:
+        RankedChoice:
+          Type: Api
+          Properties:
+            Path: /election
+            Method: post
   StartElectionFunction:
     Type: AWS::Serverless::Function
     Properties:
+      Policies:
+      - DynamoDBCrudPolicy:
+          TableName: ElectionTable
       CodeUri: StartElectionFunction
       Handler: RankedChoiceServerless::RankedChoiceServerless.ElectionController::StartElection
       Runtime: dotnetcore3.1
@@ -40,6 +77,9 @@ Resources:
   EndElectionFunction:
     Type: AWS::Serverless::Function
     Properties:
+      Policies:
+      - DynamoDBCrudPolicy:
+          TableName: ElectionTable
       CodeUri: EndElectionFunction
       Handler: RankedChoiceServerless::RankedChoiceServerless.ElectionController::EndElection
       Runtime: dotnetcore3.1
@@ -55,6 +95,9 @@ Resources:
   RestartElectionFunction:
     Type: AWS::Serverless::Function
     Properties:
+      Policies:
+      - DynamoDBCrudPolicy:
+          TableName: ElectionTable
       CodeUri: RestartElectionFunction
       Handler: RankedChoiceServerless::RankedChoiceServerless.ElectionController::RestartElection
       Runtime: dotnetcore3.1
@@ -70,6 +113,9 @@ Resources:
   GetElectionResultsFunction:
     Type: AWS::Serverless::Function
     Properties:
+      Policies:
+      - DynamoDBCrudPolicy:
+          TableName: ElectionTable
       CodeUri: GetElectionResultsFunction
       Handler: RankedChoiceServerless::RankedChoiceServerless.ElectionController::GetElectionResults
       Runtime: dotnetcore3.1
@@ -85,6 +131,9 @@ Resources:
   GetSettingsFunction:
     Type: AWS::Serverless::Function
     Properties:
+      Policies:
+      - DynamoDBCrudPolicy:
+          TableName: ElectionTable
       CodeUri: GetSettingsFunction
       Handler: RankedChoiceServerless::RankedChoiceServerless.ElectionController::GetSettings
       Runtime: dotnetcore3.1
@@ -100,6 +149,9 @@ Resources:
   GetCandidatesFunction:
     Type: AWS::Serverless::Function
     Properties:
+      Policies:
+      - DynamoDBCrudPolicy:
+          TableName: ElectionTable
       CodeUri: GetCandidatesFunction
       Handler: RankedChoiceServerless::RankedChoiceServerless.ElectionController::GetCandidates
       Runtime: dotnetcore3.1
@@ -115,6 +167,9 @@ Resources:
   SaveSettingsFunction:
     Type: AWS::Serverless::Function
     Properties:
+      Policies:
+      - DynamoDBCrudPolicy:
+          TableName: ElectionTable
       CodeUri: SaveSettingsFunction
       Handler: RankedChoiceServerless::RankedChoiceServerless.ElectionController::SaveSettings
       Runtime: dotnetcore3.1
@@ -130,6 +185,9 @@ Resources:
   SaveCandidatesFunction:
     Type: AWS::Serverless::Function
     Properties:
+      Policies:
+      - DynamoDBCrudPolicy:
+          TableName: ElectionTable
       CodeUri: SaveCandidatesFunction
       Handler: RankedChoiceServerless::RankedChoiceServerless.ElectionController::SaveCandidates
       Runtime: dotnetcore3.1
@@ -145,6 +203,9 @@ Resources:
   SaveVoteFunction:
     Type: AWS::Serverless::Function
     Properties:
+      Policies:
+      - DynamoDBCrudPolicy:
+          TableName: ElectionTable
       CodeUri: SaveVoteFunction
       Handler: RankedChoiceServerless::RankedChoiceServerless.VoteController::SaveCandidates
       Runtime: dotnetcore3.1
@@ -160,6 +221,9 @@ Resources:
   GetVoteFunction:
     Type: AWS::Serverless::Function
     Properties:
+      Policies:
+      - DynamoDBCrudPolicy:
+          TableName: ElectionTable
       CodeUri: GetVoteFunction
       Handler: RankedChoiceServerless::RankedChoiceServerless.VoteController::GetCandidates
       Runtime: dotnetcore3.1
@@ -175,6 +239,9 @@ Resources:
   SubmitVoteFunction:
     Type: AWS::Serverless::Function
     Properties:
+      Policies:
+      - DynamoDBCrudPolicy:
+          TableName: ElectionTable
       CodeUri: SubmitVoteFunction
       Handler: RankedChoiceServerless::RankedChoiceServerless.VoteController::SubmitVote
       Runtime: dotnetcore3.1

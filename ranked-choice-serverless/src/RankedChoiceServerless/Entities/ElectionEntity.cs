@@ -9,6 +9,8 @@ namespace RankedChoiceServices.Entities
     {
         public string ElectionId { get; }
     }
+    
+    public record CreateElectionEvent(string ElectionId, string EventId, DateTime EventTime) : IElectionEvent;
     public record SaveCandidatesEvent(string ElectionId, string EventId, DateTime EventTime, Candidate[] Candidates) : IElectionEvent;
     public record SaveSettingsEvent(string ElectionId, string EventId, DateTime EventTime,(bool uniqueIdPerUser, string electionName) Settings) : IElectionEvent;
     public record SaveUserEmailsEvent(string ElectionId, string EventId, DateTime EventTime, string [] Emails) : IElectionEvent;
@@ -80,12 +82,12 @@ namespace RankedChoiceServices.Entities
         public ElectionEntity(string electionId, string ownerUserId)
         {
             ElectionId = electionId;
-            OwnerUserId = string.Empty;
+            OwnerUserId = ownerUserId;
             Events = new Stack<IElectionEvent>();
 
             Dispatch(new CreateEntityEvent(electionId, EntityId.Generate() ,DateTime.Now, ownerUserId));
         }
-        public ElectionEntity(string electionId, IEnumerable<IElectionEvent> events)
+        public ElectionEntity(string electionId, IReadOnlyList<IElectionEvent> events)
         {
             ElectionId = electionId;
             OwnerUserId = string.Empty;
@@ -104,6 +106,8 @@ namespace RankedChoiceServices.Entities
         {
             switch (entityEvent)
             {
+                case CreateElectionEvent e:
+                    return true;
                 case SaveCandidatesEvent e:
                     if (State != ElectionState.New)
                     {

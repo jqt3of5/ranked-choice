@@ -35,14 +35,30 @@ namespace RankedChoiceServerless
         public Task<APIGatewayProxyResponse> CreateElection(APIGatewayProxyRequest apiProxyEvent,
             ILambdaContext context)
         {
-            var userId = apiProxyEvent.Headers["userId"];
-            var repo = new ElectionRepository();
-            var electionId = new Guid().ToString();
-            var election = repo.Create(electionId, userId);
             
-            //TODO: Convert to anonymous classes (Or do I want explicit DTOs?):
-            // return Task.FromResult(new {electionId = electionId}.toResponse());
-            return Task.FromResult(electionId.toResponse());
+            LambdaLogger.Log("Starting Lambda");
+            var userId = apiProxyEvent.Headers["userId"];
+            LambdaLogger.Log("User Id " + userId);
+            var repo = new ElectionRepository();
+            var electionId = Guid.NewGuid().ToString();
+            LambdaLogger.Log("electionId " + electionId);
+
+            try
+            {
+                var election = repo.Create(electionId, userId);
+                LambdaLogger.Log( "election "+ election.ElectionId);
+
+                repo.Save(election);
+                //TODO: Convert to anonymous classes (Or do I want explicit DTOs?):
+                // return Task.FromResult(new {electionId = electionId}.toResponse());
+                return Task.FromResult(electionId.toResponse());
+            }
+            catch (Exception e)
+            {
+                LambdaLogger.Log(e.ToString());
+            }
+
+            return Task.FromResult("".toResponse());
         }
 
         public Task<APIGatewayProxyResponse> SubmitVote(APIGatewayProxyRequest apiProxyEvent, ILambdaContext context)
