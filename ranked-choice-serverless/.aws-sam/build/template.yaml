@@ -23,6 +23,7 @@ Resources:
   AddVoteFunction:
     Type: AWS::Serverless::Function
     Properties:
+      Timeout: 15
       Policies:
       - DynamoDBCrudPolicy:
           TableName: ElectionTable
@@ -41,6 +42,7 @@ Resources:
   CreateElectionFunction:
     Type: AWS::Serverless::Function
     Properties:
+      Timeout: 15
       Policies:
       - DynamoDBCrudPolicy:
           TableName: ElectionTable
@@ -59,6 +61,7 @@ Resources:
   StartElectionFunction:
     Type: AWS::Serverless::Function
     Properties:
+      Timeout: 15
       Policies:
       - DynamoDBCrudPolicy:
           TableName: ElectionTable
@@ -77,6 +80,7 @@ Resources:
   EndElectionFunction:
     Type: AWS::Serverless::Function
     Properties:
+      Timeout: 15
       Policies:
       - DynamoDBCrudPolicy:
           TableName: ElectionTable
@@ -95,6 +99,7 @@ Resources:
   RestartElectionFunction:
     Type: AWS::Serverless::Function
     Properties:
+      Timeout: 15
       Policies:
       - DynamoDBCrudPolicy:
           TableName: ElectionTable
@@ -113,6 +118,7 @@ Resources:
   GetElectionResultsFunction:
     Type: AWS::Serverless::Function
     Properties:
+      Timeout: 15
       Policies:
       - DynamoDBCrudPolicy:
           TableName: ElectionTable
@@ -131,6 +137,7 @@ Resources:
   GetSettingsFunction:
     Type: AWS::Serverless::Function
     Properties:
+      Timeout: 15
       Policies:
       - DynamoDBCrudPolicy:
           TableName: ElectionTable
@@ -149,6 +156,7 @@ Resources:
   GetCandidatesFunction:
     Type: AWS::Serverless::Function
     Properties:
+      Timeout: 15
       Policies:
       - DynamoDBCrudPolicy:
           TableName: ElectionTable
@@ -167,6 +175,7 @@ Resources:
   SaveSettingsFunction:
     Type: AWS::Serverless::Function
     Properties:
+      Timeout: 15
       Policies:
       - DynamoDBCrudPolicy:
           TableName: ElectionTable
@@ -185,6 +194,7 @@ Resources:
   SaveCandidatesFunction:
     Type: AWS::Serverless::Function
     Properties:
+      Timeout: 15
       Policies:
       - DynamoDBCrudPolicy:
           TableName: ElectionTable
@@ -203,6 +213,7 @@ Resources:
   SaveVoteFunction:
     Type: AWS::Serverless::Function
     Properties:
+      Timeout: 15
       Policies:
       - DynamoDBCrudPolicy:
           TableName: ElectionTable
@@ -221,6 +232,7 @@ Resources:
   GetVoteFunction:
     Type: AWS::Serverless::Function
     Properties:
+      Timeout: 15
       Policies:
       - DynamoDBCrudPolicy:
           TableName: ElectionTable
@@ -239,6 +251,7 @@ Resources:
   SubmitVoteFunction:
     Type: AWS::Serverless::Function
     Properties:
+      Timeout: 15
       Policies:
       - DynamoDBCrudPolicy:
           TableName: ElectionTable

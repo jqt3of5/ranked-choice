@@ -1,0 +1,8 @@
+﻿POST https://y1sfs3ink3.execute-api.us-east-1.amazonaws.com/Prod/election
+userId:12345
+
+###
+GET https://y1sfs3ink3.execute-api.us-east-1.amazonaws.com/Prod/election/588b1512-8f77-4e77-bfea-cb4b7f20a373/candidates
+userId:12345
+
+###

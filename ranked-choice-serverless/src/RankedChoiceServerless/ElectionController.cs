@@ -179,6 +179,7 @@ namespace RankedChoiceServerless
         public Task<APIGatewayProxyResponse> GetCandidates(APIGatewayProxyRequest apiProxyEvent, ILambdaContext context)
         {
             var electionId = apiProxyEvent.PathParameters["electionId"];
+            LambdaLogger.Log($"Getting candidates for electionId: {electionId}");
             
             var repo = new ElectionRepository();
             var election = repo.Get(electionId);

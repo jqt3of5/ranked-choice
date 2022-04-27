@@ -9,17 +9,68 @@ namespace RankedChoiceServices.Entities
     {
         public string ElectionId { get; }
     }
-    
-    public record CreateElectionEvent(string ElectionId, string EventId, DateTime EventTime) : IElectionEvent;
-    public record SaveCandidatesEvent(string ElectionId, string EventId, DateTime EventTime, Candidate[] Candidates) : IElectionEvent;
-    public record SaveSettingsEvent(string ElectionId, string EventId, DateTime EventTime,(bool uniqueIdPerUser, string electionName) Settings) : IElectionEvent;
-    public record SaveUserEmailsEvent(string ElectionId, string EventId, DateTime EventTime, string [] Emails) : IElectionEvent;
-    public record SubmitVoteEvent(string ElectionId, string EventId, DateTime EventTime, Vote Vote) : IElectionEvent;
-    public record CreateEntityEvent(string ElectionId, string EventId, DateTime EventTime, string OwnerUserId) : IElectionEvent;
-    public record StartEntityEvent(string ElectionId, string EventId, DateTime EventTime) : IElectionEvent;
-    public record RestartEntityEvent(string ElectionId, string EventId, DateTime EventTime) : IElectionEvent;
-    public record EndEntityEvent(string ElectionId, string EventId, DateTime EventTime) : IElectionEvent;
-    
+
+    public class CreateElectionEvent : IElectionEvent
+    {
+        public string ElectionId { get; set;}
+        public string EventId { get; set; }
+        public DateTime EventTime { get; set;}
+        public string OwnerUserId { get; set;}
+    }
+
+    public class SaveCandidatesEvent : IElectionEvent
+    {
+        public string ElectionId{ get; set;}
+        public string EventId{ get; set;}
+        public DateTime EventTime{ get; set;}
+        public Candidate[] Candidates { get; set;}
+    }
+
+    public class SaveSettingsEvent : IElectionEvent
+    {
+        public string ElectionId { get; set;}
+        public string EventId { get; set;}
+        public DateTime EventTime { get; set;}
+        public (bool uniqueIdPerUser, string electionName) Settings { get; set;}
+    }
+
+    public class SaveUserEmailsEvent : IElectionEvent
+    {
+        public string ElectionId{ get; set;}
+        public string EventId{ get; set;}
+        public DateTime EventTime{ get; set;}
+        public string[] Emails { get; set;}
+    }
+
+    public class SubmitVoteEvent : IElectionEvent
+    {
+        public string ElectionId { get; set;}
+        public string EventId { get; set;}
+        public DateTime EventTime { get; set;}
+        public Vote Vote { get; set;}
+    }
+
+    public class StartElectionEvent : IElectionEvent
+    {
+        public string ElectionId { get; set;}
+        public string EventId { get; set;}
+        public DateTime EventTime { get; set;}
+    }
+
+    public class RestartElectionEvent : IElectionEvent
+    {
+        public string ElectionId { get; set;}
+        public string EventId { get; set;}
+        public DateTime EventTime { get; set;}
+    }
+
+    public class EndElectionEvent : IElectionEvent
+    {
+        public string ElectionId { get; set;} 
+        public string EventId { get; set;}
+        public DateTime EventTime { get; set;}
+    }
+
     public class ElectionEntity : IElection, IEntity<IElectionEvent>
     {
         public Stack<IElectionEvent> Events { get; }
@@ -85,7 +136,7 @@ namespace RankedChoiceServices.Entities
             OwnerUserId = ownerUserId;
             Events = new Stack<IElectionEvent>();
 
-            Dispatch(new CreateEntityEvent(electionId, EntityId.Generate() ,DateTime.Now, ownerUserId));
+            Dispatch(new CreateElectionEvent{ ElectionId = electionId, EventId = EntityId.Generate(), EventTime = DateTime.Now, OwnerUserId = ownerUserId});
         }
         public ElectionEntity(string electionId, IReadOnlyList<IElectionEvent> events)
         {
@@ -106,8 +157,6 @@ namespace RankedChoiceServices.Entities
         {
             switch (entityEvent)
             {
-                case CreateElectionEvent e:
-                    return true;
                 case SaveCandidatesEvent e:
                     if (State != ElectionState.New)
                     {
@@ -147,7 +196,7 @@ namespace RankedChoiceServices.Entities
 
                     _votes.Add(e.Vote);
                     return true;
-                case CreateEntityEvent e:
+                case CreateElectionEvent e:
                     if (!string.IsNullOrEmpty(OwnerUserId))
                     {
                         return false;
@@ -155,7 +204,7 @@ namespace RankedChoiceServices.Entities
                     OwnerUserId = e.OwnerUserId;
                     State = ElectionState.New;
                     return true;
-                case StartEntityEvent e:
+                case StartElectionEvent e:
                     switch (State)
                     {
                         case ElectionState.New:
@@ -167,7 +216,7 @@ namespace RankedChoiceServices.Entities
                     }
 
                     return false;
-                case EndEntityEvent e:
+                case EndElectionEvent e:
                     switch (State)
                     {
                         case ElectionState.New:
@@ -180,7 +229,7 @@ namespace RankedChoiceServices.Entities
                             return false;
                     }
                     return false;
-                case RestartEntityEvent e:
+                case RestartElectionEvent e:
                     switch (State)
                     {
                         case ElectionState.New:
@@ -205,36 +254,36 @@ namespace RankedChoiceServices.Entities
 
         public bool SaveCandidates(IEnumerable<Candidate> candidates)
         {
-            return Dispatch(new SaveCandidatesEvent(ElectionId, EntityId.Generate(), DateTime.Now, candidates.ToArray()));
+            return Dispatch(new SaveCandidatesEvent{ElectionId = ElectionId, EventId = EntityId.Generate(), EventTime = DateTime.Now, Candidates = candidates.ToArray()});
         }
         public bool StartElection()
         {
-            return Dispatch(new StartEntityEvent(ElectionId, EntityId.Generate(), DateTime.Now));
+            return Dispatch(new StartElectionEvent{ElectionId = ElectionId, EventId = EntityId.Generate(), EventTime = DateTime.Now});
         }
 
         public bool StopElection()
         {
-            return Dispatch(new EndEntityEvent(ElectionId, EntityId.Generate(), DateTime.Now));
+            return Dispatch(new EndElectionEvent{ElectionId = ElectionId, EventId = EntityId.Generate(), EventTime = DateTime.Now});
         }
         
         public bool RestartElection()
         {
-            return Dispatch(new RestartEntityEvent(ElectionId, EntityId.Generate(), DateTime.Now));
+            return Dispatch(new RestartElectionEvent{ElectionId = ElectionId, EventId = EntityId.Generate(), EventTime = DateTime.Now});
         }
 
         public bool SetUserEmails(string [] emails)
         {
-            return Dispatch(new SaveUserEmailsEvent(ElectionId, EntityId.Generate(), DateTime.Now, emails));
+            return Dispatch(new SaveUserEmailsEvent{ElectionId = ElectionId, EventId = EntityId.Generate(), EventTime = DateTime.Now, Emails = emails});
         }
 
         public bool AddVote(Vote vote)
         {
-            return Dispatch(new SubmitVoteEvent(ElectionId, EntityId.Generate(), DateTime.Now, vote));
+            return Dispatch(new SubmitVoteEvent{ElectionId = ElectionId, EventId = EntityId.Generate(), EventTime = DateTime.Now, Vote = vote});
         }
 
         public bool SaveSettings(bool uniqueIdsPerUser, string electionName)
         {
-            return Dispatch(new SaveSettingsEvent(ElectionId, EntityId.Generate(), DateTime.Now, (uniqueIdsPerUser, electionName)));
+            return Dispatch(new SaveSettingsEvent{ElectionId = ElectionId, EventId = EntityId.Generate(), EventTime = DateTime.Now, Settings = (uniqueIdsPerUser, electionName)});
         }
     }
 }

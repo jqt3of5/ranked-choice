@@ -39,6 +39,27 @@ namespace RankedChoiceServices.Entities
                             case CreateElectionEvent e:
                                 doc = Context.ToDocument(e);
                                 break;
+                            case SaveCandidatesEvent e:
+                                doc = Context.ToDocument(e);
+                                break;
+                            case SaveSettingsEvent e:
+                                doc = Context.ToDocument(e);
+                                break;
+                            case SaveUserEmailsEvent e:
+                                doc = Context.ToDocument(e);
+                                break;
+                            case SubmitVoteEvent e:
+                                doc = Context.ToDocument(e);
+                                break;
+                            case StartElectionEvent e:
+                                doc = Context.ToDocument(e);
+                                break;
+                            case RestartElectionEvent e:
+                                doc = Context.ToDocument(e);
+                                break;
+                            case EndElectionEvent e:
+                                doc = Context.ToDocument(e);
+                                break;
                             default:
                                 throw new ArgumentException(
                                     $"entityEvent of type: {entityEvent.GetType().Name} not supported");
@@ -86,9 +107,10 @@ namespace RankedChoiceServices.Entities
         public IElection? Get(string electionId)
         {
             var filter = new ScanFilter();
-            filter.AddCondition("ElectionId", ScanOperator.Equal, electionId);
+            filter.AddCondition(nameof(IElectionEvent.ElectionId), ScanOperator.Equal, electionId);
             if (ElectionTable.Scan(filter) is { } search)
             {
+                LambdaLogger.Log($"{search.Count}");
                 var events = new List<IElectionEvent>();
                 foreach (var match in search.Matches)
                 {
@@ -110,17 +132,14 @@ namespace RankedChoiceServices.Entities
                        case nameof(SubmitVoteEvent):
                            e = Context.FromDocument<SubmitVoteEvent>(match);
                            break;
-                       case nameof(CreateEntityEvent):
-                           e = Context.FromDocument<CreateEntityEvent>(match);
+                       case nameof(StartElectionEvent):
+                           e = Context.FromDocument<StartElectionEvent>(match);
                            break;
-                       case nameof(StartEntityEvent):
-                           e = Context.FromDocument<StartEntityEvent>(match);
+                       case nameof(RestartElectionEvent):
+                           e = Context.FromDocument<RestartElectionEvent>(match);
                            break;
-                       case nameof(RestartEntityEvent):
-                           e = Context.FromDocument<RestartEntityEvent>(match);
-                           break;
-                       case nameof(EndEntityEvent):
-                           e = Context.FromDocument<EndEntityEvent>(match);
+                       case nameof(EndElectionEvent):
+                           e = Context.FromDocument<EndElectionEvent>(match);
                            break;
                        default:
                            LambdaLogger.Log($"Type {match["Type"]} does exist");
@@ -129,7 +148,10 @@ namespace RankedChoiceServices.Entities
                    events.Add(e);
                 }
 
-                return new ElectionEntity(electionId, events);
+                if (events.Any())
+                {
+                    return new ElectionEntity(electionId, events);
+                }
             }
             
             return null;
