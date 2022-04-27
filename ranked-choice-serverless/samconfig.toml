@@ -1,0 +1,9 @@
+version = 0.1
+[default]
+[default.deploy]
+[default.deploy.parameters]
+stack_name = "RankedChoiceServerless"
+s3_bucket = "aws-sam-cli-managed-default-samclisourcebucket-ej7ho353wbwt"
+s3_prefix = "RankedChoiceServerless"
+region = "us-east-1"
+capabilities = "CAPABILITY_IAM"
