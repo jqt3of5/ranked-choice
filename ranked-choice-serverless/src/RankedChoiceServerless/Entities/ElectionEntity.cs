@@ -28,10 +28,16 @@ namespace RankedChoiceServices.Entities
 
     public class SaveSettingsEvent : IElectionEvent
     {
+        public class ElectionSettings
+        {
+            public bool UniqueIdPerUser { get; set; }
+            public string ElectionName{ get; set; }
+            
+        }
         public string ElectionId { get; set;}
         public string EventId { get; set;}
         public DateTime EventTime { get; set;}
-        public (bool uniqueIdPerUser, string electionName) Settings { get; set;}
+        public ElectionSettings Settings { get; set;}
     }
 
     public class SaveUserEmailsEvent : IElectionEvent
@@ -76,6 +82,8 @@ namespace RankedChoiceServices.Entities
         public Stack<IElectionEvent> Events { get; }
         
         public string ElectionId { get; private set; }
+        
+        public string ElectionName { get; private set; }
         public string OwnerUserId { get; private set; }
 
         private List<IReadOnlyList<Candidate>> _history = new();
@@ -170,7 +178,8 @@ namespace RankedChoiceServices.Entities
                     {
                         return false;
                     }
-                    UniqueIdsPerUser = e.Settings.uniqueIdPerUser;
+                    UniqueIdsPerUser = e.Settings.UniqueIdPerUser;
+                    ElectionName = e.Settings.ElectionName;
                     
                     return true;
                 case SaveUserEmailsEvent e:
@@ -180,7 +189,7 @@ namespace RankedChoiceServices.Entities
                         return false;
                     } 
                     _users.Clear();
-                    _users.AddRange(e.Emails.Select(e => new User(e)));
+                    _users.AddRange(e.Emails.Select(e => new User{email = e}));
 
                     return true;
                 case SubmitVoteEvent e:
@@ -283,7 +292,7 @@ namespace RankedChoiceServices.Entities
 
         public bool SaveSettings(bool uniqueIdsPerUser, string electionName)
         {
-            return Dispatch(new SaveSettingsEvent{ElectionId = ElectionId, EventId = EntityId.Generate(), EventTime = DateTime.Now, Settings = (uniqueIdsPerUser, electionName)});
+            return Dispatch(new SaveSettingsEvent{ElectionId = ElectionId, EventId = EntityId.Generate(), EventTime = DateTime.Now, Settings = new SaveSettingsEvent.ElectionSettings{UniqueIdPerUser = uniqueIdsPerUser, ElectionName = electionName}});
         }
     }
 }

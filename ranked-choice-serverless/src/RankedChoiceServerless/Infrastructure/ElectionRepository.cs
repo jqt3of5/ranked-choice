@@ -76,13 +76,13 @@ namespace RankedChoiceServices.Entities
             }
         }
 
-        public bool Exists(string electionId)
+        public async Task<bool> Exists(string electionId)
         {
             var filter = new ScanFilter();
             filter.AddCondition("ElectionId", ScanOperator.Equal, electionId);
             if (ElectionTable.Scan(filter) is { } search)
             {
-                return search.Matches.Any();
+                return search.Count != 0;
             }
 
             return false;
@@ -104,15 +104,14 @@ namespace RankedChoiceServices.Entities
             return null;
         }
 
-        public IElection? Get(string electionId)
+        public async Task<IElection?> Get(string electionId)
         {
             var filter = new ScanFilter();
             filter.AddCondition(nameof(IElectionEvent.ElectionId), ScanOperator.Equal, electionId);
             if (ElectionTable.Scan(filter) is { } search)
             {
-                LambdaLogger.Log($"{search.Count}");
                 var events = new List<IElectionEvent>();
-                foreach (var match in search.Matches)
+                foreach (var match in await search.GetNextSetAsync())
                 {
                     IElectionEvent e;
                     switch (match["EventType"])

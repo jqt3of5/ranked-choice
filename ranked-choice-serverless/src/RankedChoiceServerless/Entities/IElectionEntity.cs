@@ -3,15 +3,28 @@ using HelloWorld.Data;
 
 namespace RankedChoiceServices.Entities
 {
-    public record Candidate(string value, string candidateId);
+    public class Candidate
+    {
+        public string value { get; set; }
+        public string candidateId { get; set; }
+    }
 
-    public record User(string email);
+    public class User
+    {
+        public string email { get; set; }
+    }
 
-    public record Vote(string userId, Candidate [] candidates);
+    public class Vote
+    {
+        public string userId { get; set; }
+        public Candidate [] candidates { get; set; }
+    }
 
     public interface IElection
     {
         public string ElectionId { get; }
+        
+        public string ElectionName { get; }
         
         //Query
         //TODO: Doesn't include metadata, like dates, and users, etc. 

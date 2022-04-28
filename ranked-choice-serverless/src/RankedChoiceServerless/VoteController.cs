@@ -32,7 +32,7 @@ namespace HelloWorld
                 return Task.FromResult(false.toResponse(400));
             }
 
-            var candidates = vote.candidates.Select(c => new Candidate(c.value, c.candidateId)).ToArray();
+            var candidates = vote.candidates.Select(c => new Candidate{value = c.value, candidateId = c.candidateId}).ToArray();
 
             entity.SaveVote(candidates);
              
