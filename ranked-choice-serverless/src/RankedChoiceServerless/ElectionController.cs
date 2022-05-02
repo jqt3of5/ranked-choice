@@ -108,7 +108,7 @@ namespace RankedChoiceServerless
             var result = election.StartElection();
             repo.Save(election);
             
-            return  new ElectionResponse(string.Empty, false, result).toResponse();
+            return  new ElectionResponse(string.Empty, result, result).toResponse();
         }
         
         public async Task<APIGatewayProxyResponse> EndElection(APIGatewayProxyRequest apiProxyEvent, ILambdaContext context)
@@ -124,7 +124,7 @@ namespace RankedChoiceServerless
             var result = election.StopElection();
             repo.Save(election);
             
-            return new ElectionResponse(string.Empty, true, result).toResponse();
+            return new ElectionResponse(string.Empty, result, result).toResponse();
         }
         
         public async Task<APIGatewayProxyResponse> RestartElection(APIGatewayProxyRequest apiProxyEvent, ILambdaContext context)
@@ -140,7 +140,7 @@ namespace RankedChoiceServerless
             var result = election.RestartElection();
             repo.Save(election);
             
-            return new ElectionResponse(string.Empty, true, result).toResponse();
+            return new ElectionResponse(string.Empty, result, result).toResponse();
         }
         
         public async Task<APIGatewayProxyResponse> GetElectionResults(APIGatewayProxyRequest apiProxyEvent, ILambdaContext context)

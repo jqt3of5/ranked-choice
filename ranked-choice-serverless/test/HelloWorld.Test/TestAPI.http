@@ -15,7 +15,7 @@ Content-Type: application/json
 POST https://y1sfs3ink3.execute-api.us-east-1.amazonaws.com/Prod/election/588b1512-8f77-4e77-bfea-cb4b7f20a373/start
 userId:12345
 ###
-POST https://y1sfs3ink3.execute-api.us-east-1.amazonaws.com/Prod/election/588b1512-8f77-4e77-bfea-cb4b7f20a373/stop
+POST https://y1sfs3ink3.execute-api.us-east-1.amazonaws.com/Prod/election/588b1512-8f77-4e77-bfea-cb4b7f20a373/end
 userId:12345
 ###
 POST https://y1sfs3ink3.execute-api.us-east-1.amazonaws.com/Prod/election/588b1512-8f77-4e77-bfea-cb4b7f20a373/restart

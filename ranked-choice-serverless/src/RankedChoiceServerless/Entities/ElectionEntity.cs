@@ -140,10 +140,7 @@ namespace RankedChoiceServices.Entities
 
         public ElectionEntity(string electionId, string ownerUserId)
         {
-            ElectionId = electionId;
-            OwnerUserId = ownerUserId;
             Events = new Stack<IElectionEvent>();
-
             Dispatch(new CreateElectionEvent{ ElectionId = electionId, EventId = EntityId.Generate(), EventTime = DateTime.Now, OwnerUserId = ownerUserId});
         }
         public ElectionEntity(string electionId, IReadOnlyList<IElectionEvent> events)
@@ -203,13 +200,21 @@ namespace RankedChoiceServices.Entities
                         return false;
                     }
 
-                    _votes.Add(e.Vote);
-                    return true;
-                case CreateElectionEvent e:
-                    if (!string.IsNullOrEmpty(OwnerUserId))
+                    //Invalid candidate id
+                    if (e.Vote.candidates.Any(c => Candidates.All(can => can.candidateId != c.candidateId)))
                     {
                         return false;
                     }
+
+                    _votes.Add(e.Vote);
+                    return true;
+                case CreateElectionEvent e:
+                    if (Events.Any())
+                    {
+                        return false;
+                    }
+
+                    ElectionId = e.ElectionId;
                     OwnerUserId = e.OwnerUserId;
                     State = ElectionState.New;
                     return true;
@@ -217,6 +222,7 @@ namespace RankedChoiceServices.Entities
                     switch (State)
                     {
                         case ElectionState.New:
+                        case ElectionState.Reset:
                             State = ElectionState.Started;
                             return true;
                         case ElectionState.Started:
@@ -229,6 +235,7 @@ namespace RankedChoiceServices.Entities
                     switch (State)
                     {
                         case ElectionState.New:
+                        case ElectionState.Reset:
                             return false;
                         case ElectionState.Started:
                             State = ElectionState.Finished;
@@ -242,10 +249,11 @@ namespace RankedChoiceServices.Entities
                     switch (State)
                     {
                         case ElectionState.New:
+                        case ElectionState.Reset:
                         case ElectionState.Started:
                             return false;
                         case ElectionState.Finished:
-                            State = ElectionState.Started;
+                            State = ElectionState.Reset;
                             _votes.Clear();
                             return true;
                     }
@@ -257,8 +265,13 @@ namespace RankedChoiceServices.Entities
 
         bool Dispatch(IElectionEvent e)
         {
-            Events.Push(e);
-            return Reduce(e);
+            if (Reduce(e))
+            {
+                Events.Push(e);
+                return true;
+            }
+
+            return false;
         }
 
         public bool SaveCandidates(IEnumerable<Candidate> candidates)

@@ -2,7 +2,7 @@
 {
     public enum ElectionState
     {
-        New, Started, Finished
+        New, Started, Finished, Reset
     }
     public record CandidateDTO(string value, string candidateId);
     public record ElectionDTO(string electionId, CandidateDTO[] candidates);
