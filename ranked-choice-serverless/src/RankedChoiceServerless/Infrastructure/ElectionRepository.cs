@@ -13,7 +13,7 @@ using JsonConverter = Newtonsoft.Json.JsonConverter;
 
 namespace RankedChoiceServices.Entities
 {
-    public class ElectionRepository : EntityRepository
+    public class ElectionRepository 
     {
         public ElectionRepository()
         {
@@ -25,7 +25,7 @@ namespace RankedChoiceServices.Entities
         private Table ElectionTable { get; }
         private DynamoDBContext Context{ get; }
 
-        public async void Save(IElection election)
+        public async Task Save(IElection election)
         {
             if (election is IEntity<IElectionEvent> entity)
             {
@@ -79,7 +79,7 @@ namespace RankedChoiceServices.Entities
         public async Task<bool> Exists(string electionId)
         {
             var filter = new ScanFilter();
-            filter.AddCondition("ElectionId", ScanOperator.Equal, electionId);
+            filter.AddCondition(nameof(IElectionEvent.ElectionId), ScanOperator.Equal, electionId);
             if (ElectionTable.Scan(filter) is { } search)
             {
                 return search.Count != 0;

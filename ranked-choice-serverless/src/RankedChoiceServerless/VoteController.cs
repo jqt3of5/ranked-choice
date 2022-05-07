@@ -11,7 +11,7 @@ namespace HelloWorld
 {
     public class VoteController
     {
-        public Task<APIGatewayProxyResponse> SaveCandidates(APIGatewayProxyRequest apiProxyEvent, ILambdaContext context)
+        public async Task<APIGatewayProxyResponse> SaveCandidates(APIGatewayProxyRequest apiProxyEvent, ILambdaContext context)
         {
             var vote = JsonConvert.DeserializeObject<VoteDTO>(apiProxyEvent.Body);
             var userId = apiProxyEvent.Headers["userId"];
@@ -19,13 +19,7 @@ namespace HelloWorld
 
             var voteRepository = new VoteRepository();
             
-            var entity = voteRepository.GetForUser(userId, electionId);
-            if (entity == null)
-            {
-                LambdaLogger.Log($"Vote for user {userId} for election {electionId} created");
-                entity = voteRepository.Create(userId, electionId);
-            }
-
+            var entity = await voteRepository.GetForUser(userId, electionId);
             if (entity.Submitted)
             {
                 LambdaLogger.Log($"Vote for user {userId} for election {electionId} not saved because it has already been submitted");
@@ -49,11 +43,6 @@ namespace HelloWorld
             var voteRepository = new VoteRepository();
             
             var entity = voteRepository.GetForUser(userId, electionId);
-            if (entity == null)
-            {
-                LambdaLogger.Log($"Vote for user {userId} for election {electionId}");
-                entity = voteRepository.Create(userId, electionId);
-            }
 
             var result = new VoteDTO(entity.Submitted, entity.Candidates.Select(e => new CandidateDTO(e.value, e.candidateId)).ToArray());
             return Task.FromResult(result.toResponse());
