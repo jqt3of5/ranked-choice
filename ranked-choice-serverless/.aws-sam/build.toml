@@ -6,6 +6,6 @@ codeuri = "C:\\Users\\jqt3o\\sd\\ranked-choice\\ranked-choice-serverless\\src\\R
 runtime = "dotnetcore3.1"
 source_md5 = ""
 packagetype = "Zip"
-functions = ["AddVoteFunction", "CreateElectionFunction", "StartElectionFunction", "EndElectionFunction", "RestartElectionFunction", "GetElectionResultsFunction", "GetSettingsFunction", "GetCandidatesFunction", "SaveSettingsFunction", "SaveCandidatesFunction", "SaveVoteFunction", "GetVoteFunction", "SubmitVoteFunction"]
+functions = ["CreateElectionFunction", "StartElectionFunction", "EndElectionFunction", "RestartElectionFunction", "GetElectionResultsFunction", "GetSettingsFunction", "GetCandidatesFunction", "SaveSettingsFunction", "SaveCandidatesFunction", "SaveVoteFunction", "GetVoteFunction", "SubmitVoteFunction"]
 
 [layer_build_definitions]

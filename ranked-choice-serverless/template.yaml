@@ -22,25 +22,6 @@ Resources:
       ProvisionedThroughput:
         ReadCapacityUnits: "5"
         WriteCapacityUnits: "5"
-  AddVoteFunction:
-    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
-    Properties:
-      Timeout: 15
-      Policies:
-        - DynamoDBCrudPolicy:
-            TableName: "ElectionTable"
-      CodeUri: ./src/RankedChoiceServerless/
-      Handler: RankedChoiceServerless::RankedChoiceServerless.ElectionController::SubmitVote
-      Runtime: dotnetcore3.1
-      Environment: # More info about Env Vars: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#environment-object
-        Variables:
-          PARAM1: VALUE
-      Events:
-        RankedChoice:
-          Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
-          Properties:
-            Path: /election/{electionId}/vote
-            Method: post 
   CreateElectionFunction:
     Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
     Properties:
@@ -219,6 +200,8 @@ Resources:
       Policies:
         - DynamoDBCrudPolicy:
             TableName: "ElectionTable"
+        - DynamoDBCrudPolicy:
+            TableName: "VoteTable"
       CodeUri: ./src/RankedChoiceServerless/
       Handler: RankedChoiceServerless::RankedChoiceServerless.VoteController::SaveCandidates
       Runtime: dotnetcore3.1
@@ -238,6 +221,8 @@ Resources:
       Policies:
         - DynamoDBCrudPolicy:
             TableName: "ElectionTable"
+        - DynamoDBCrudPolicy:
+            TableName: "VoteTable"
       CodeUri: ./src/RankedChoiceServerless/
       Handler: RankedChoiceServerless::RankedChoiceServerless.VoteController::GetCandidates
       Runtime: dotnetcore3.1
@@ -257,6 +242,8 @@ Resources:
       Policies:
         - DynamoDBCrudPolicy:
             TableName: "ElectionTable"
+        - DynamoDBCrudPolicy:
+            TableName: "VoteTable"
       CodeUri: ./src/RankedChoiceServerless/
       Handler: RankedChoiceServerless::RankedChoiceServerless.VoteController::SubmitVote
       Runtime: dotnetcore3.1

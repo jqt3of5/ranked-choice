@@ -30,9 +30,17 @@ Content-Type: application/json
 
 {"electionId": "588b1512-8f77-4e77-bfea-cb4b7f20a373", "uniqueIdsPerUser": false, "userEmails": ["jqt3of5@gmail.com"], "electionName":  "My Election"}
 ###
-POST https://y1sfs3ink3.execute-api.us-east-1.amazonaws.com/Prod/election/588b1512-8f77-4e77-bfea-cb4b7f20a373/vote
+
+GET https://y1sfs3ink3.execute-api.us-east-1.amazonaws.com/Prod/vote/588b1512-8f77-4e77-bfea-cb4b7f20a373
+userId:12345
+###
+
+POST https://y1sfs3ink3.execute-api.us-east-1.amazonaws.com/Prod/vote/588b1512-8f77-4e77-bfea-cb4b7f20a373
 userId:12345
 Content-Type: application/json
 
-["aaaa","bbbb"]
+["aaaa", "bbbb"]
+###
+POST https://y1sfs3ink3.execute-api.us-east-1.amazonaws.com/Prod/vote/588b1512-8f77-4e77-bfea-cb4b7f20a373/submit
+userId:12345
 ###

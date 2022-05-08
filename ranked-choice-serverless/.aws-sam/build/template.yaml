@@ -20,25 +20,6 @@ Resources:
       ProvisionedThroughput:
         ReadCapacityUnits: '5'
         WriteCapacityUnits: '5'
-  AddVoteFunction:
-    Type: AWS::Serverless::Function
-    Properties:
-      Timeout: 15
-      Policies:
-      - DynamoDBCrudPolicy:
-          TableName: ElectionTable
-      CodeUri: AddVoteFunction
-      Handler: RankedChoiceServerless::RankedChoiceServerless.ElectionController::SubmitVote
-      Runtime: dotnetcore3.1
-      Environment:
-        Variables:
-          PARAM1: VALUE
-      Events:
-        RankedChoice:
-          Type: Api
-          Properties:
-            Path: /election/{electionId}/vote
-            Method: post
   CreateElectionFunction:
     Type: AWS::Serverless::Function
     Properties:
@@ -217,6 +198,8 @@ Resources:
       Policies:
       - DynamoDBCrudPolicy:
           TableName: ElectionTable
+      - DynamoDBCrudPolicy:
+          TableName: VoteTable
       CodeUri: SaveVoteFunction
       Handler: RankedChoiceServerless::RankedChoiceServerless.VoteController::SaveCandidates
       Runtime: dotnetcore3.1
@@ -236,6 +219,8 @@ Resources:
       Policies:
       - DynamoDBCrudPolicy:
           TableName: ElectionTable
+      - DynamoDBCrudPolicy:
+          TableName: VoteTable
       CodeUri: GetVoteFunction
       Handler: RankedChoiceServerless::RankedChoiceServerless.VoteController::GetCandidates
       Runtime: dotnetcore3.1
@@ -255,6 +240,8 @@ Resources:
       Policies:
       - DynamoDBCrudPolicy:
           TableName: ElectionTable
+      - DynamoDBCrudPolicy:
+          TableName: VoteTable
       CodeUri: SubmitVoteFunction
       Handler: RankedChoiceServerless::RankedChoiceServerless.VoteController::SubmitVote
       Runtime: dotnetcore3.1

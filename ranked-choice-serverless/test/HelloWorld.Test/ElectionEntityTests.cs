@@ -5,7 +5,7 @@ using Xunit;
 
 namespace HelloWorld.Tests
 {
-    public class EntityTests
+    public class ElectionEntityTests
     {
         [Fact]
         void TestCreateElection()

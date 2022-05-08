@@ -32,7 +32,7 @@ namespace RankedChoiceServerless
     }
     public class ElectionController
     {
-        public Task<APIGatewayProxyResponse> CreateElection(APIGatewayProxyRequest apiProxyEvent,
+        public async Task<APIGatewayProxyResponse> CreateElection(APIGatewayProxyRequest apiProxyEvent,
             ILambdaContext context)
         {
             
@@ -48,56 +48,22 @@ namespace RankedChoiceServerless
                 var election = repo.Create(electionId, userId);
                 LambdaLogger.Log( "election "+ election.ElectionId);
 
-                repo.Save(election);
-                return Task.FromResult(new ElectionResponse(string.Empty, true, electionId).toResponse());
+                await repo.Save(election);
+                return new ElectionResponse(string.Empty, true, electionId).toResponse();
             }
             catch (Exception e)
             {
                 LambdaLogger.Log(e.ToString());
             }
 
-            return Task.FromResult(new ElectionResponse("Failed to create a new election due to exception", false, null).toResponse());
+            return new ElectionResponse("Failed to create a new election due to exception", false, null).toResponse();
         }
 
-        public async Task<APIGatewayProxyResponse> SubmitVote(APIGatewayProxyRequest apiProxyEvent, ILambdaContext context)
-        {
-            string[] candidateIds = JsonConvert.DeserializeObject<string[]>(apiProxyEvent.Body);
-            var userId = apiProxyEvent.Headers["userId"];
-            var electionId = apiProxyEvent.PathParameters["electionId"];
-            
-            var repo = new ElectionRepository();
-            var election = await repo.Get(electionId);
-            if (election == null)
-            {
-                LambdaLogger.Log($"Election with Id {electionId} does not exist");
-                return new ElectionResponse($"Election with Id {electionId} does not exist", false,null).toResponse(404);
-            }
-
-            List<Candidate> candidates = new List<Candidate>();
-            foreach (var candidateId in candidateIds)
-            {
-                var candidate = election.Candidates.FirstOrDefault(c => c.candidateId == candidateId);
-                if (candidate == null)
-                {
-                    //That id is not valid, fail!
-                    LambdaLogger.Log($"candidate with Id {candidateId} does not exist");
-                    return new ElectionResponse($"candidate with Id {candidateId} does not exist", false,null).toResponse(400);
-                }
-                
-                candidates.Add(candidate);
-            }
-            
-            election.AddVote(new Vote{userId = userId, candidates = candidates.ToArray()});
-
-            repo.Save(election);
-            
-            return new ElectionResponse(string.Empty, true, null).toResponse();
-        }
-        
         public async Task<APIGatewayProxyResponse> StartElection(APIGatewayProxyRequest apiProxyEvent, ILambdaContext context)
         {
             var electionId = apiProxyEvent.PathParameters["electionId"];
             
+            //TODO: Send email to users listed. Also generate unique ids for those users
             var repo = new ElectionRepository();
             var election = await repo.Get(electionId);
             if (election == null)
@@ -105,8 +71,9 @@ namespace RankedChoiceServerless
                 LambdaLogger.Log($"Election with Id {electionId} does not exist");
                 return new ElectionResponse($"Election with Id {electionId} does not exist", false, null).toResponse(404);
             } 
+            
             var result = election.StartElection();
-            repo.Save(election);
+            await repo.Save(election);
             
             return  new ElectionResponse(string.Empty, result, result).toResponse();
         }
@@ -122,7 +89,7 @@ namespace RankedChoiceServerless
                 return new ElectionResponse($"Election with Id {electionId} does not exist", false, null).toResponse(404);
             }
             var result = election.StopElection();
-            repo.Save(election);
+            await repo.Save(election);
             
             return new ElectionResponse(string.Empty, result, result).toResponse();
         }
@@ -138,7 +105,7 @@ namespace RankedChoiceServerless
                 return new ElectionResponse($"Election with Id {electionId} does not exist", false, null).toResponse(404);
             }
             var result = election.RestartElection();
-            repo.Save(election);
+            await repo.Save(election);
             
             return new ElectionResponse(string.Empty, result, result).toResponse();
         }
@@ -233,7 +200,7 @@ namespace RankedChoiceServerless
             election.SetUserEmails(settings.userEmails);
             election.SaveSettings(settings.uniqueIdsPerUser, settings.electionName);
 
-            repo.Save(election);
+            await repo.Save(election);
             return new ElectionResponse(string.Empty, true, null).toResponse();
         }
         
@@ -266,7 +233,7 @@ namespace RankedChoiceServerless
             
             election.SaveCandidates(candidates);
             
-            repo.Save(election);
+            await repo.Save(election);
             
             return new ElectionResponse(string.Empty, true, null).toResponse();
         }

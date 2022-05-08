@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace RankedChoiceServices.Entities
 {
-    public class VoteEntity : IVoteEntity
+    public class VoteEntity : IVoteEntity, IEntity<VoteEntity.IVoteEntityEvent>
     {
         public interface IVoteEntityEvent : IEntityEvent
         {

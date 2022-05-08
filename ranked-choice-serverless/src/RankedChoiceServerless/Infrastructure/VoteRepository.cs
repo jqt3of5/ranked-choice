@@ -51,7 +51,7 @@ namespace RankedChoiceServices.Entities
             return new VoteEntity(userId, electionId, events);
         }
 
-        public async Task SaveForUser(string userId, string electionId, IVoteEntity vote)
+        public async Task<bool> SaveForUser(string userId, string electionId, IVoteEntity vote)
         {
             if (vote is IEntity<VoteEntity.IVoteEntityEvent> entity)
             {
@@ -73,7 +73,8 @@ namespace RankedChoiceServices.Entities
                     await VoteTable.UpdateItemAsync(doc);
                 }    
             }
+
+            return true;
         }
-        
     }
 }
