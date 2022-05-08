@@ -1,50 +1,50 @@
-import {ElectionDTO, ElectionSettingsDTO} from "./Data";
+import {ElectionDTO, ElectionResponse, ElectionSettingsDTO} from "./Data";
 
-export function createElection(userId : string) : Promise<string>
+export async function createElection(userId : string) : Promise<ElectionResponse<string>>
 {
-    return fetch(`${process.env.REACT_APP_API}/election/`, {method:"POST"})
-        .then(res => res.json().then(res => res as string))
+    var response = await fetch(`${process.env.REACT_APP_API}/election/`, {method:"POST", headers:{"userId":userId}})
+    return await response.json()
 }
-export function getElectionCandidates(electionId : string, userId : string) : Promise<ElectionDTO>
+export async function getElectionCandidates(electionId : string, userId : string) : Promise<ElectionResponse<ElectionDTO>>
 {
-    return fetch(`${process.env.REACT_APP_API}/election/${electionId}/candidates`)
-        .then(res => res.json().then(res => res as ElectionDTO))
+    var response = await fetch(`${process.env.REACT_APP_API}/election/${electionId}/candidates`, { headers:{"userId":userId}})
+    return await response.json()
 }
-export function getElectionSettings(electionId : string, userId : string) : Promise<ElectionDTO>
+export async function getElectionSettings(electionId : string, userId : string) : Promise<ElectionResponse<ElectionDTO>>
 {
-    return fetch(`${process.env.REACT_APP_API}/election/${electionId}/settings`)
-        .then(res => res.json().then(res => res as ElectionDTO))
+    var response = await fetch(`${process.env.REACT_APP_API}/election/${electionId}/settings`,{ headers:{"userId":userId}})
+    return response.json()
 }
 
-export function saveElectionCandidates(electionId : string, userId : string, election: ElectionDTO)
+export async function saveElectionCandidates(electionId : string, userId : string, election: ElectionDTO)
 {
-    fetch(`${process.env.REACT_APP_API}/election/${electionId}/candidates`,
-        {method: "POST", headers:{"Content-Type":"application/json"},
+    await fetch(`${process.env.REACT_APP_API}/election/${electionId}/candidates`,
+        {method: "POST", headers:{"Content-Type":"application/json", "userId":userId},
             body:JSON.stringify(election)})
 }
-export function saveElectionSettings(electionId : string, userId : string, settings: ElectionSettingsDTO)
+export async function saveElectionSettings(electionId : string, userId : string, settings: ElectionSettingsDTO)
 {
-    fetch(`${process.env.REACT_APP_API}/election/${electionId}/settings`,
-        {method: "POST", headers:{"Content-Type":"application/json"},
+    await fetch(`${process.env.REACT_APP_API}/election/${electionId}/settings`,
+        {method: "POST", headers:{"Content-Type":"application/json", "userId":userId},
             body:JSON.stringify(settings)})
 }
-export function getElectionResults(electionId : string, userId : string) : Promise<ElectionDTO>
+export async function getElectionResults(electionId : string, userId : string) : Promise<ElectionResponse<ElectionDTO>>
 {
-    return fetch(`${process.env.REACT_APP_API}/election/${electionId}/results`)
-        .then(res => res.json().then(res => res as ElectionDTO))
+    var response = await fetch(`${process.env.REACT_APP_API}/election/${electionId}/results`, {headers:{"userId":userId}})
+    return await response.json()
 }
-export function startElection(electionId : string, userId : string) : Promise<boolean>
+export async function startElection(electionId : string, userId : string) : Promise<ElectionResponse<boolean>>
 {
-    return fetch(`${process.env.REACT_APP_API}/election/${electionId}/start`)
-        .then(res => res.json().then(res => res as boolean ))
+    var response = await fetch(`${process.env.REACT_APP_API}/election/${electionId}/start`, {headers:{"userId":userId}})
+    return await response.json()
 }
-export function endElection(electionId : string, userId : string) : Promise<boolean>
+export async function endElection(electionId : string, userId : string) : Promise<ElectionResponse<boolean>>
 {
-    return fetch(`${process.env.REACT_APP_API}/election/${electionId}/end`)
-        .then(res => res.json().then(res => res as boolean ))
+    var response = await fetch(`${process.env.REACT_APP_API}/election/${electionId}/end`,{headers:{"userId":userId}})
+    return await response.json()
 }
-export function restartElection(electionId : string, userId : string) : Promise<boolean>
+export async function restartElection(electionId : string, userId : string) : Promise<ElectionResponse<boolean>>
 {
-    return fetch(`${process.env.REACT_APP_API}/election/${electionId}/restart`)
-        .then(res => res.json().then(res => res as boolean ))
+    var response = await fetch(`${process.env.REACT_APP_API}/election/${electionId}/restart`,{headers:{"userId":userId}})
+    return await response.json()
 }

@@ -26,3 +26,15 @@ export interface VoteDTO {
     submitted : boolean
     candidates: CandidateDTO[]
 }
+
+export interface ElectionResponse<T> {
+    message : string,
+    success : boolean,
+    response : T | null
+}
+
+export interface VoteResponse<T> {
+    message : string,
+    success : boolean,
+    response : T | null
+}
