@@ -20,6 +20,23 @@ Resources:
       ProvisionedThroughput:
         ReadCapacityUnits: '5'
         WriteCapacityUnits: '5'
+  VoteTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      AttributeDefinitions:
+      - AttributeName: EventId
+        AttributeType: S
+      - AttributeName: EventTime
+        AttributeType: S
+      KeySchema:
+      - AttributeName: EventId
+        KeyType: HASH
+      - AttributeName: EventTime
+        KeyType: RANGE
+      TableName: VoteTable
+      ProvisionedThroughput:
+        ReadCapacityUnits: '5'
+        WriteCapacityUnits: '5'
   CreateElectionFunction:
     Type: AWS::Serverless::Function
     Properties:

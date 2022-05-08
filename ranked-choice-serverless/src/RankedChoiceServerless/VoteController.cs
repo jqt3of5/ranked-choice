@@ -51,9 +51,14 @@ namespace RankedChoiceServerless
                     var candidate = election.Candidates.FirstOrDefault(c => c.candidateId == candidateId);
                     if (candidate == null)
                     {
+                        var response = $"candidate with Id {candidateId} does not exist. Valid candidates are: ";
+                        foreach (var id in election.Candidates.Select(c => c.candidateId))
+                        {
+                            response += $"{id}, ";
+                        }
                         //That id is not valid, fail!
-                        LambdaLogger.Log($"candidate with Id {candidateId} does not exist");
-                        return new VoteResponse($"candidate with Id {candidateId} does not exist", false,null).toResponse(400);
+                        LambdaLogger.Log(response);
+                        return new VoteResponse(response, false,null).toResponse(400);
                     }
                     
                     candidates.Add(candidate);

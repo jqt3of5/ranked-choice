@@ -149,6 +149,7 @@ namespace RankedChoiceServices.Entities
 
                 if (events.Any())
                 {
+                    events.Sort((a, b) => a.EventTime > b.EventTime ? 1 : -1);
                     return new ElectionEntity(electionId, events);
                 }
             }

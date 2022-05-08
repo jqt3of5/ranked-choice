@@ -31,6 +31,6 @@ namespace RankedChoiceServices.Entities
 
     public interface IEntity<T> where T : IEntityEvent
     {
-        public Stack<T> Events { get; } 
+        public IReadOnlyList<T> Events { get; } 
     }
 }

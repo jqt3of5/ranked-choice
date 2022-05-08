@@ -110,5 +110,22 @@ namespace HelloWorld.Tests
             
             Assert.False(result);
         }     
+        
+        [Fact]
+        void TestLoadEvents()
+        {
+            var entity = new ElectionEntity("test", "owner");
+            entity.SaveCandidates(new[] { new Candidate(){candidateId = "1", value = "A"}, new Candidate(){candidateId = "2", value = "B"} });
+            entity.StartElection();
+            var result = entity.AddVote(new Vote(){candidates = new []{entity.Candidates.First()}, userId = "voter"});
+            entity.StopElection();
+
+            var e = new ElectionEntity("test1", entity.Events.ToList());
+            
+            Assert.Equal(ElectionState.Finished,e.State);
+            Assert.Equal(5, e.Events.Count);
+            Assert.Equal(2, e.Candidates.Count);
+            
+        }    
     }
 }

@@ -38,24 +38,22 @@ namespace RankedChoiceServices.Entities
         {
             get => _submitted;
         }
-   
-        public Stack<IVoteEntityEvent> Events { get; }
+
+        private List<IVoteEntityEvent> _events = new();
+        public IReadOnlyList<IVoteEntityEvent> Events => _events;
 
         public VoteEntity(string userId, string electionId)
         {
             Candidates = new List<Candidate>();
-            Events = new Stack<IVoteEntityEvent>();
             UserId = userId;
             ElectionId = electionId;
         }
         public VoteEntity(string userId, string electionId, IEnumerable<IVoteEntityEvent> events) 
             : this(userId, electionId)
         {
-            Events = new Stack<IVoteEntityEvent>(events);
-            
             foreach (var voteEntityEvent in events)
             {
-                Reduce(voteEntityEvent);
+                Dispatch(voteEntityEvent);
             }
         }
 
@@ -87,7 +85,7 @@ namespace RankedChoiceServices.Entities
         {
             if (Reduce(e))
             {
-                Events.Push(e);
+                _events.Add(e);
                 return true;
             }
 

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Amazon.Lambda.Core;
 using HelloWorld.Data;
 
 namespace RankedChoiceServices.Entities
@@ -79,7 +80,8 @@ namespace RankedChoiceServices.Entities
 
     public class ElectionEntity : IElection, IEntity<IElectionEvent>
     {
-        public Stack<IElectionEvent> Events { get; }
+        private List<IElectionEvent> _events = new();
+        public IReadOnlyList<IElectionEvent> Events => _events;
         
         public string ElectionId { get; private set; }
         
@@ -140,29 +142,30 @@ namespace RankedChoiceServices.Entities
 
         public ElectionEntity(string electionId, string ownerUserId)
         {
-            Events = new Stack<IElectionEvent>();
             Dispatch(new CreateElectionEvent{ ElectionId = electionId, EventId = EntityId.Generate(), EventTime = DateTime.Now, OwnerUserId = ownerUserId});
         }
         public ElectionEntity(string electionId, IReadOnlyList<IElectionEvent> events)
         {
             ElectionId = electionId;
             OwnerUserId = string.Empty;
-            Events = new Stack<IElectionEvent>(events);
             if (!events.Any())
             {
                 throw new ArgumentException("events cannot be empty");
             }
-            foreach (var @event in Events)
+            
+            foreach (var @event in events)
             {
-                Reduce(@event);
+                Dispatch(@event);
             }
         }
 
         public bool Reduce(IEntityEvent entityEvent)
         {
+            LambdaLogger.Log($"event: {entityEvent.GetType()} {entityEvent.EventTime}");
             switch (entityEvent)
             {
                 case SaveCandidatesEvent e:
+                    LambdaLogger.Log($"{State} {e.Candidates}");
                     if (State != ElectionState.New)
                     {
                         return false;
@@ -267,7 +270,7 @@ namespace RankedChoiceServices.Entities
         {
             if (Reduce(e))
             {
-                Events.Push(e);
+                _events.Add(e);
                 return true;
             }
 
