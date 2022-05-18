@@ -18,7 +18,7 @@ namespace RankedChoiceServerless
         {
             //TODO: Doesn't respect election status
             var candidateIds= JsonConvert.DeserializeObject<string[]>(apiProxyEvent.Body);
-            var userId = apiProxyEvent.Headers["userId"];
+            var userId = apiProxyEvent.Headers["userid"];
             var electionId = apiProxyEvent.PathParameters["electionId"];
             
             try
@@ -82,7 +82,7 @@ namespace RankedChoiceServerless
         
         public async Task<APIGatewayProxyResponse> GetCandidates(APIGatewayProxyRequest apiProxyEvent, ILambdaContext context)
         {
-            var userId = apiProxyEvent.Headers["userId"];
+            var userId = apiProxyEvent.Headers["userid"];
             var electionId = apiProxyEvent.PathParameters["electionId"];
             
             try
@@ -117,7 +117,7 @@ namespace RankedChoiceServerless
 
         public async Task<APIGatewayProxyResponse> SubmitVote(APIGatewayProxyRequest apiProxyEvent, ILambdaContext context)
         {
-            var userId = apiProxyEvent.Headers["userId"];
+            var userId = apiProxyEvent.Headers["userid"];
             var electionId = apiProxyEvent.PathParameters["electionId"];
 
             //TODO: Unique id per user system needs to be implemented

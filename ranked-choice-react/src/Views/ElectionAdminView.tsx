@@ -10,7 +10,7 @@ import {v4} from "uuid";
 import {useParams} from "react-router-dom";
 import {BiDuplicate} from "react-icons/bi";
 import {CardTable} from "../Components/Table";
-import {getElectionCandidates, saveElectionCandidates} from "../Common/ElectionModel";
+import {getElectionCandidates, saveElectionCandidates, startElection} from "../Common/ElectionModel";
 
 export function ElectionAdminView() {
     var [state, dispatch] = useReducer(card_table_reducer, {
@@ -31,11 +31,17 @@ export function ElectionAdminView() {
     let electionId = params.electionId as string
 
     useEffect(() => {
-        getElectionCandidates(electionId, cookies.userId).then((election => {
-            let candidateCardData = election.candidates.map(c => {return {id:c.candidateId, text: c.value}})
+        const fetchData = async () =>
+        {
+            var electionResponse = await getElectionCandidates(electionId, cookies.userId)
+            if (electionResponse.response != null)
+            {
+                let candidateCardData = electionResponse.response.candidates.map(c => {return {id:c.candidateId, text: c.value}})
+                dispatch({type:CardTableActionType.SetCards, cards: [candidateCardData]})
+            }
+        }
 
-            dispatch({type:CardTableActionType.SetCards, cards: [candidateCardData]})
-        }))
+        fetchData().catch(e => console.log(e))
     },[electionId, cookies.userId])
 
     useEffect(() => {
@@ -71,7 +77,7 @@ export function ElectionAdminView() {
                         <a href={electionUrl}>{electionUrl}</a>
                         <BiDuplicate/>
                     </div>
-                    <button>Start</button>
+                    <button onClick={() => startElection(electionId, cookies.userId)}>Start</button>
                 </div>
             </div>
 

@@ -56,6 +56,19 @@ Resources:
           Properties:
             Path: /election
             Method: post
+  CreateElectionCorsFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Timeout: 15
+      CodeUri: CreateElectionCorsFunction
+      Handler: RankedChoiceServerless::RankedChoiceServerless.CorsController::OnOption
+      Runtime: dotnetcore3.1
+      Events:
+        RankedChoice:
+          Type: Api
+          Properties:
+            Path: /election
+            Method: options
   StartElectionFunction:
     Type: AWS::Serverless::Function
     Properties:
@@ -75,6 +88,19 @@ Resources:
           Properties:
             Path: /election/{electionId}/start
             Method: post
+  StartElectionCorsFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Timeout: 15
+      CodeUri: StartElectionCorsFunction
+      Handler: RankedChoiceServerless::RankedChoiceServerless.CorsController::OnOption
+      Runtime: dotnetcore3.1
+      Events:
+        RankedChoice:
+          Type: Api
+          Properties:
+            Path: /election/{electionId}/start
+            Method: options
   EndElectionFunction:
     Type: AWS::Serverless::Function
     Properties:
@@ -94,6 +120,19 @@ Resources:
           Properties:
             Path: /election/{electionId}/end
             Method: post
+  EndElectionCorsFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Timeout: 15
+      CodeUri: EndElectionCorsFunction
+      Handler: RankedChoiceServerless::RankedChoiceServerless.CorsController::OnOption
+      Runtime: dotnetcore3.1
+      Events:
+        RankedChoice:
+          Type: Api
+          Properties:
+            Path: /election/{electionId}/end
+            Method: options
   RestartElectionFunction:
     Type: AWS::Serverless::Function
     Properties:
@@ -113,6 +152,19 @@ Resources:
           Properties:
             Path: /election/{electionId}/restart
             Method: post
+  RestartElectionCorsFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Timeout: 15
+      CodeUri: RestartElectionCorsFunction
+      Handler: RankedChoiceServerless::RankedChoiceServerless.CorsController::OnOption
+      Runtime: dotnetcore3.1
+      Events:
+        RankedChoice:
+          Type: Api
+          Properties:
+            Path: /election/{electionId}/restart
+            Method: options
   GetElectionResultsFunction:
     Type: AWS::Serverless::Function
     Properties:
@@ -132,6 +184,19 @@ Resources:
           Properties:
             Path: /election/{electionId}/results
             Method: get
+  ElectionResultsCorsFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Timeout: 15
+      CodeUri: ElectionResultsCorsFunction
+      Handler: RankedChoiceServerless::RankedChoiceServerless.CorsController::OnOption
+      Runtime: dotnetcore3.1
+      Events:
+        RankedChoice:
+          Type: Api
+          Properties:
+            Path: /election/{electionId}/results
+            Method: options
   GetSettingsFunction:
     Type: AWS::Serverless::Function
     Properties:
@@ -151,6 +216,19 @@ Resources:
           Properties:
             Path: /election/{electionId}/settings
             Method: get
+  SettingsCorsFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Timeout: 15
+      CodeUri: SettingsCorsFunction
+      Handler: RankedChoiceServerless::RankedChoiceServerless.CorsController::OnOption
+      Runtime: dotnetcore3.1
+      Events:
+        RankedChoice:
+          Type: Api
+          Properties:
+            Path: /election/{electionId}/settings
+            Method: options
   GetCandidatesFunction:
     Type: AWS::Serverless::Function
     Properties:
@@ -170,6 +248,19 @@ Resources:
           Properties:
             Path: /election/{electionId}/candidates
             Method: get
+  CandidatesCorsFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Timeout: 15
+      CodeUri: CandidatesCorsFunction
+      Handler: RankedChoiceServerless::RankedChoiceServerless.CorsController::OnOption
+      Runtime: dotnetcore3.1
+      Events:
+        RankedChoice:
+          Type: Api
+          Properties:
+            Path: /election/{electionId}/candidates
+            Method: options
   SaveSettingsFunction:
     Type: AWS::Serverless::Function
     Properties:
@@ -208,6 +299,19 @@ Resources:
           Properties:
             Path: /election/{electionId}/candidates
             Method: post
+  VoteCorsFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Timeout: 15
+      CodeUri: VoteCorsFunction
+      Handler: RankedChoiceServerless::RankedChoiceServerless.CorsController::OnOption
+      Runtime: dotnetcore3.1
+      Events:
+        RankedChoice:
+          Type: Api
+          Properties:
+            Path: /vote/{electionId}
+            Method: options
   SaveVoteFunction:
     Type: AWS::Serverless::Function
     Properties:
@@ -250,6 +354,19 @@ Resources:
           Properties:
             Path: /vote/{electionId}
             Method: get
+  SubmitVoteCorsFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Timeout: 15
+      CodeUri: SubmitVoteCorsFunction
+      Handler: RankedChoiceServerless::RankedChoiceServerless.CorsController::OnOption
+      Runtime: dotnetcore3.1
+      Events:
+        RankedChoice:
+          Type: Api
+          Properties:
+            Path: /vote/{electionId}/submit
+            Method: options
   SubmitVoteFunction:
     Type: AWS::Serverless::Function
     Properties:

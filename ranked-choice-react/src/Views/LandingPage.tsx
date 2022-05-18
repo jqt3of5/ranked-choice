@@ -22,10 +22,15 @@ export function LandingPage() {
                 <h2>Welcome to my ranked choice voting app!</h2>
                 {state.electionId != "" && <Navigate to={"/election/" + state.electionId}/>}
 
-                <a onClick={e => {
-                    createElection(cookies.userId).then(guid => {
-                        setState(s => {return {...s, electionId: guid}})
-                    })
+                <a href={"#"} onClick={async e => {
+                    var electionResponse = await createElection(cookies.userId)
+                    if (electionResponse.response != null)
+                    {
+                        var guid = electionResponse.response
+                        setState(state => {
+                            return {...state, electionId: guid}}
+                        )
+                    }
                 }}>Click here to start a new election</a>
 
         </div>

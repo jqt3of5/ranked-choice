@@ -7,7 +7,7 @@ import {CandidateDTO, VoteDTO} from "../Common/Data";
 import {useCookies} from "react-cookie";
 import {v4} from "uuid";
 import {useParams} from "react-router-dom";
-import {getVote, saveVote} from "../Common/VoteModel";
+import {getVote, saveVote, submitVote} from "../Common/VoteModel";
 import {getElectionCandidates} from "../Common/ElectionModel";
 import {CardTable} from "../Components/Table";
 import {Card} from "../Components/Card";
@@ -15,6 +15,8 @@ import {Card} from "../Components/Card";
 interface VoteViewState
 {
     isReadOnly : boolean
+    candidates: CandidateDTO[]
+    choices : CandidateDTO[]
 }
 
 export function VoteView() {
@@ -30,6 +32,8 @@ export function VoteView() {
 
     var [{isReadOnly}, setState] = useState<VoteViewState>({
         isReadOnly: false,
+        candidates: [],
+        choices: []
     })
 
     const [cookies, setCookie] = useCookies(['userId'])
@@ -39,60 +43,59 @@ export function VoteView() {
     }
 
     useEffect(() => {
-        getVote(electionId, cookies.userId).then(
-            (vote) => {
-                    getElectionCandidates(electionId, cookies.userId).then(
-                        (election) => {
-                            setState(state => {
-                                return {...state, isReadOnly:vote.submitted, candidates:election.candidates, choices:vote.candidates}
-                            })
+        const fetchData = async () => {
+            var voteResponse = await getVote(electionId, cookies.userId)
+            var electionResponse = await getElectionCandidates(electionId, cookies.userId)
 
-                            let candidateCardData = election.candidates.map(c => {return {id:c.candidateId, text: c.value}})
-                            let voteCardData = vote.candidates.map(c => {return {id:c.candidateId, text: c.value}})
+            if (electionResponse.response != null && voteResponse.response != null)
+            {
+                let candidateCardData = electionResponse.response.candidates.map(c => {return {id:c.candidateId, text: c.value}})
+                let voteCardData = voteResponse.response.candidates.map(c => {return {id:c.candidateId, text: c.value}})
 
-                            candidateCardData = candidateCardData.filter(card => voteCardData.find(c => c.id === card.id) === undefined)
+                candidateCardData = candidateCardData.filter(card => voteCardData.find(c => c.id === card.id) === undefined)
 
-                            setState(state => {return {...state, isReadOnly: vote.submitted}})
-                            dispatch({type:CardTableActionType.SetCards, cards: [candidateCardData, voteCardData]})
-                        },
-                        (error) => {
-                            console.log(error)
-                        })
-                },
-                (error) => {
-                    console.log(error)
-                }
-            )
+                setState(state => {
+                    return {...state,
+                        isReadOnly:voteResponse?.response?.submitted ?? false,
+                        candidates: electionResponse?.response?.candidates ?? [],
+                        choices:voteResponse?.response?.candidates ?? [] }
+                })
+
+                dispatch({type:CardTableActionType.SetCards, cards: [candidateCardData, voteCardData]})
+            }
+        }
+
+        fetchData().catch(e => console.log(e))
+
     }, [cookies.userId, electionId])
 
     useEffect(() => {
 
-        let cands: CandidateDTO[] = tableState.table[0].map(value => {return {electionId: electionId, candidateId: value.id, value: value.text}})
-        let chois : CandidateDTO[] = tableState.table[1].map(value => {return {electionId: electionId, candidateId: value.id, value: value.text}})
+        const saveData = async () => {
+            let cands: CandidateDTO[] = tableState.table[0].map(value => {return {electionId: electionId, candidateId: value.id, value: value.text}})
+            let chois : CandidateDTO[] = tableState.table[1].map(value => {return {electionId: electionId, candidateId: value.id, value: value.text}})
 
-        cands = cands.filter(card => chois.find(c => c.candidateId === card.candidateId) === undefined)
+            cands = cands.filter(card => chois.find(c => c.candidateId === card.candidateId) === undefined)
 
-        let vote : VoteDTO = {submitted: false, candidates: chois}
-        saveVote(electionId, cookies.userId, vote).then(
-            (vote) => {
-                if (vote)
-                {
-                    setState(state => {
-                        return {...state, choices:chois, candidates: cands}
-                    })
-                }
-            },
-            (error) => {
-                console.log(error)
+            let voteDTO : VoteDTO = {submitted: false, candidates: chois}
+            var vote = await saveVote(electionId, cookies.userId, voteDTO)
+            if (vote.success)
+            {
+                setState(state => {
+                    return {...state, choices:chois, candidates: cands}
+                })
             }
-        )
+        }
+
+        saveData().catch(e => console.log(e))
+
     }, [tableState.table, cookies.userId, electionId])
 
     //TODO: If no election exists, show error
 
     return <div className={"vote-view"}>
         <div className={"vote-view-header primary"}>
-            <button>Submit Vote</button>
+            <button onClick={() => submitVote(electionId, cookies.userId)}>Submit Vote</button>
         </div>
         <CardTable>
            <Column canEdit={false} canReorder={true} name={"Candidates"} column={0} showRank={false} dispatch={dispatch}>

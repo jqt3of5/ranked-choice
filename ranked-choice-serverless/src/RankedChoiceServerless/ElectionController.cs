@@ -27,7 +27,17 @@ namespace RankedChoiceServerless
     {
         public static APIGatewayProxyResponse toResponse(this object obj, int statusCode = 200)
         {
-            return new APIGatewayProxyResponse() { Body = JsonConvert.SerializeObject(obj) , StatusCode = statusCode};
+            return new APIGatewayProxyResponse()
+            {
+                Body = JsonConvert.SerializeObject(obj),
+                StatusCode = statusCode,
+                Headers = new Dictionary<string, string>()
+                {
+                    { "Access-Control-Allow-Headers", "Content-Type, userid" },
+                    { "Access-Control-Allow-Origin", "*" },
+                    { "Access-Control-Allow-Methods", "OPTIONS,POST,GET" }
+                },
+            };
         }     
     }
     public class ElectionController
@@ -35,13 +45,9 @@ namespace RankedChoiceServerless
         public async Task<APIGatewayProxyResponse> CreateElection(APIGatewayProxyRequest apiProxyEvent,
             ILambdaContext context)
         {
-            
-            LambdaLogger.Log("Starting Lambda");
-            var userId = apiProxyEvent.Headers["userId"];
-            LambdaLogger.Log("User Id " + userId);
+            var userId = apiProxyEvent.Headers["userid"];
             var repo = new ElectionRepository();
             var electionId = Guid.NewGuid().ToString();
-            LambdaLogger.Log("electionId " + electionId);
 
             try
             {
@@ -174,7 +180,7 @@ namespace RankedChoiceServerless
         public async Task<APIGatewayProxyResponse> SaveSettings(APIGatewayProxyRequest apiProxyEvent, ILambdaContext context)
         {
             var electionId = apiProxyEvent.PathParameters["electionId"];
-            var userId = apiProxyEvent.Headers["userId"];
+            var userId = apiProxyEvent.Headers["userid"];
             var settings = JsonConvert.DeserializeObject<ElectionSettingsDTO>(apiProxyEvent.Body); 
             
             var repo = new ElectionRepository();
@@ -207,7 +213,7 @@ namespace RankedChoiceServerless
         public async Task<APIGatewayProxyResponse> SaveCandidates(APIGatewayProxyRequest apiProxyEvent, ILambdaContext context)
         {
             var electionId = apiProxyEvent.PathParameters["electionId"];
-            var userId = apiProxyEvent.Headers["userId"];
+            var userId = apiProxyEvent.Headers["userid"];
             var dto = JsonConvert.DeserializeObject<ElectionDTO>(apiProxyEvent.Body); 
             
             var repo = new ElectionRepository();
