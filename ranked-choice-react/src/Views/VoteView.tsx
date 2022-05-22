@@ -45,44 +45,48 @@ export function VoteView() {
     }
     let electionId = params.electionId as string
 
-    var [{isReadOnly}, setState] = useState({isReadOnly: false})
+    var [{isReadOnly, dataRetrieved}, setState] = useState({isReadOnly: false, dataRetrieved: false})
 
     var [{candidates, choices}, dispatch] = useReducer(vote_view_reducer,{
         candidates: [],
         choices: []
     })
 
-    useEffect(() => {
-        const fetchData = async () => {
-            var voteResponse = await getVote(electionId, cookies.userId)
-            var electionResponse = await getElectionCandidates(electionId, cookies.userId)
+    const fetchData = async () => {
+        var voteResponse = await getVote(electionId, cookies.userId)
+        var electionResponse = await getElectionCandidates(electionId, cookies.userId)
 
-            if (electionResponse.response != null && voteResponse.response != null)
-            {
-                let candidateCardData = electionResponse.response.candidates
-                let voteCardData = voteResponse.response.candidates
+        if (electionResponse.response != null && voteResponse.response != null)
+        {
+            let candidateCardData = electionResponse.response.candidates
+            let voteCardData = voteResponse.response.candidates
 
-                candidateCardData = candidateCardData.filter(card => voteCardData.find(c => c.candidateId=== card.candidateId) === undefined)
+            candidateCardData = candidateCardData.filter(card => voteCardData.find(c => c.candidateId=== card.candidateId) === undefined)
 
-                dispatch({type: CardTableActionType.SetCards, cards:[candidateCardData, voteCardData]})
-                setState({isReadOnly: voteResponse.response.submitted})
-            }
+            dispatch({type: CardTableActionType.SetCards, cards:[candidateCardData, voteCardData]})
+            setState({isReadOnly: voteResponse.response.submitted, dataRetrieved: true})
         }
+    }
+
+    useEffect(() => {
 
         fetchData().catch(e => console.log(e))
 
-    }, [cookies.userId, electionId])
+    }, [])
+
+    const saveData = async () => {
+        let voteDTO : VoteDTO = {submitted: false, candidates: choices }
+        var vote = await saveVote(electionId, cookies.userId, voteDTO)
+    }
 
     useEffect(() => {
 
-        const saveData = async () => {
-            let voteDTO : VoteDTO = {submitted: false, candidates: choices }
-            var vote = await saveVote(electionId, cookies.userId, voteDTO)
+        if (dataRetrieved)
+        {
+            saveData().catch(e => console.log(e))
         }
 
-        saveData().catch(e => console.log(e))
-
-    }, [choices, cookies.userId, electionId])
+    }, [choices])
 
     //TODO: If no election exists, show error
 
