@@ -21,6 +21,12 @@ namespace RankedChoiceServerless
             var userId = apiProxyEvent.Headers["userid"];
             var electionId = apiProxyEvent.PathParameters["electionId"];
             
+            LambdaLogger.Log($"For user {userId} and election {electionId} Saving Vote with candidateIds:");
+            if (candidateIds.Any())
+            {
+                LambdaLogger.Log(candidateIds.Aggregate((a,b)=> a + " " + b));
+            }
+            
             try
             { 
                 var electionRepository = new ElectionRepository();
@@ -71,6 +77,7 @@ namespace RankedChoiceServerless
                 }
            
                 await voteRepository.SaveForUser(userId, electionId, entity);
+                LambdaLogger.Log($"Successfully saved candidate selections");
                 return new VoteResponse(string.Empty, true, null).toResponse();
             }
             catch (Exception e)
@@ -84,6 +91,8 @@ namespace RankedChoiceServerless
         {
             var userId = apiProxyEvent.Headers["userid"];
             var electionId = apiProxyEvent.PathParameters["electionId"];
+            
+            LambdaLogger.Log($"For user {userId} and election {electionId} Saving Vote with candidateIds:");
             
             try
             {
