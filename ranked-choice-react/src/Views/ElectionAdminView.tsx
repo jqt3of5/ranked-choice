@@ -2,7 +2,7 @@ import React, {useEffect, useReducer} from 'react';
 import {Column} from '../Components/Column';
 import './ElectionAdminView.css'
 import '../Common/common.css'
-import {CardTableActionType, card_table_reducer} from "./CardTableReducer";
+import {CardTableActionType, card_table_reducer, CardTableAction, shortId} from "./CardTableReducer";
 import {CandidateDTO, ElectionDTO} from "../Common/Data";
 import {Card} from "../Components/Card";
 import {useCookies} from "react-cookie";
@@ -11,10 +11,26 @@ import {useParams} from "react-router-dom";
 import {BiDuplicate} from "react-icons/bi";
 import {CardTable} from "../Components/Table";
 import {getElectionCandidates, saveElectionCandidates, startElection} from "../Common/ElectionModel";
+import {IoAdd} from "react-icons/io5";
+
+interface AdminViewState
+{
+   candidates : CandidateDTO[]
+}
+
+function admin_view_reducer(state :AdminViewState, action : CardTableAction<CandidateDTO>) : AdminViewState
+{
+    var newState = card_table_reducer({
+        table:[state.candidates],
+        editCard: (value,card) => {return {...card, value: value}}
+    }, action)
+
+    return {...state, candidates: newState.table[0]}
+}
 
 export function ElectionAdminView() {
-    var [state, dispatch] = useReducer(card_table_reducer, {
-        table: [[],[]]
+    var [state, dispatch] = useReducer(admin_view_reducer, {
+        candidates:[]
     })
 
     const [cookies, setCookie] = useCookies(['userId'])
@@ -36,7 +52,7 @@ export function ElectionAdminView() {
             var electionResponse = await getElectionCandidates(electionId, cookies.userId)
             if (electionResponse.response != null)
             {
-                let candidateCardData = electionResponse.response.candidates.map(c => {return {id:c.candidateId, text: c.value}})
+                let candidateCardData = electionResponse.response.candidates
                 dispatch({type:CardTableActionType.SetCards, cards: [candidateCardData]})
             }
         }
@@ -46,10 +62,9 @@ export function ElectionAdminView() {
 
     useEffect(() => {
         //Seems to be really chatty. Probably should diff and check
-        let candidates : CandidateDTO[] = state.table[0].map(value => {return {electionId: electionId, candidateId: value.id, value: value.text}})
-        let election :ElectionDTO = {electionId: electionId, candidates: candidates}
+        let election :ElectionDTO = {electionId: electionId, candidates: state.candidates}
         saveElectionCandidates(electionId, cookies.userId, election)
-    }, [state.table, cookies.userId, electionId])
+    }, [state.candidates, cookies.userId, electionId])
 
 
     let electionUrl = `http://localhost:3000/vote/${electionId}`
@@ -64,12 +79,17 @@ export function ElectionAdminView() {
                         showRank={false}
                         dispatch={dispatch}>
 
-                    {state.table[0].map((card, index) => {
-                        return <Card key={"card" + card.id} card={card}
+                    {state.candidates.map((card, index) => {
+                        return <Card key={"card" + card.candidateId} id={card.candidateId} value={card.value}
                                      index={index} column={0}
                                      canEdit={true} canReorder={true} canDelete={true}
                                      dispatch={dispatch}/>
                     })}
+
+                    <div className={"add-new-card secondary"} onClick={event =>
+                        dispatch({type:CardTableActionType.AddCard, column:0, card: {candidateId: shortId(), value:"Card"}})}>
+                        <IoAdd/>Add new card
+                    </div>
 
                 </Column>
                 <div className={"box create-election-share"}>

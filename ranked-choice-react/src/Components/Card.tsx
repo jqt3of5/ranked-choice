@@ -10,9 +10,9 @@ export interface CardData {
     text : string;
 }
 
-export interface CardProps {
-    card: CardData
-
+export interface CardProps<T> {
+    value: string
+    id : string
     index: number
     column: number
 
@@ -20,7 +20,7 @@ export interface CardProps {
     canEdit: boolean
     canDelete: boolean
 
-    dispatch : (action : CardTableAction) => void
+    dispatch : (action : CardTableAction<T>) => void
 }
 
 export const ItemTypes = {
@@ -34,7 +34,7 @@ export interface DragItem {
     type: string
 }
 
-export function Card(props : CardProps) {
+export function Card<T>(props : CardProps<T>) {
 
     const [{editing, text}, setState] = useState({editing: false, text: ""})
 
@@ -47,7 +47,7 @@ export function Card(props : CardProps) {
             return {handlerId: monitor.getHandlerId(), isDragging: monitor.isDragging()}
         },
         item: monitor => {
-           return {index: props.index, column: props.column, id: props.card.id, type: ItemTypes.CARD}
+           return {index: props.index, column: props.column, id: props.id, type: ItemTypes.CARD}
         },
         canDrag: monitor => props.canReorder && !editing
     })
@@ -59,7 +59,7 @@ export function Card(props : CardProps) {
             return {isOver: monitor.isOver()}
         },
         hover(item: DragItem, monitor) {
-            if (props.canReorder && item.id !== props.card.id)
+            if (props.canReorder && item.id !== props.id)
             {
                 props.dispatch({type:CardTableActionType.MoveCard,
                     sourceIndex: item.index, sourceColumn: item.column,
@@ -87,11 +87,11 @@ export function Card(props : CardProps) {
     drop(ref)
     return <div ref={ref} className={"card"} data-handler-id={handlerId}>
         <div className={"card-content"}  style ={{opacity: isOver? 0.4 : 1, backgroundColor: isOver ? "lightgray" : "white"}}>
-            {!props.canEdit && <label>{props.card.text}</label>}
-            {props.canEdit && !editing && <label onDoubleClick={event => setState({text:props.card.text, editing: true})}>{props.card.text}</label>}
+            {!props.canEdit && <label>{props.value}</label>}
+            {props.canEdit && !editing && <label onDoubleClick={event => setState({text:props.value, editing: true})}>{props.value}</label>}
 
             {editing && <div className={"masked-background"} onClick={event => {
-                props.dispatch({type:CardTableActionType.EditCard, card:{...props.card, text:text}, index: props.index, column: props.column})
+                props.dispatch({type:CardTableActionType.EditCard, value:text, index: props.index, column: props.column})
                 setState({text: text, editing: false})
             }}/>}
 

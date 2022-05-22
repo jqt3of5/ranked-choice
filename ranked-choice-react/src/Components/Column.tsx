@@ -6,7 +6,7 @@ import {useDrop} from "react-dnd";
 import {CardTableAction, CardTableActionType} from "../Views/CardTableReducer";
 import {IoAdd} from "react-icons/io5";
 
-export interface ColumnProps {
+export interface ColumnProps<T> {
     canEdit: boolean
     canReorder : boolean
 
@@ -16,10 +16,10 @@ export interface ColumnProps {
 
     children : ReactNode[]
 
-    dispatch : (action : CardTableAction) => void
+    dispatch : (action : CardTableAction<T>) => void
 }
 
-export function Column(props : ColumnProps) {
+export function Column<T>(props : ColumnProps<T>) {
 
     const [, drop] = useDrop<DragItem, void, {isOver: boolean}>({
         accept: ItemTypes.CARD,
@@ -62,7 +62,6 @@ export function Column(props : ColumnProps) {
             )
         */}
 
-            {props.canEdit && <div className={"add-new-card secondary"} onClick={event => props.dispatch({type:CardTableActionType.AddCard, column:props.column})}><IoAdd/>Add new card</div>}
         </div>
     </div>
 }

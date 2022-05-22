@@ -2,7 +2,7 @@ import React, {useEffect, useReducer, useState} from 'react';
 import {Column} from '../Components/Column';
 import './VoteView.css'
 import '../Common/common.css'
-import {CardTableActionType, card_table_reducer} from "./CardTableReducer";
+import {CardTableActionType, card_table_reducer, CardTableAction} from "./CardTableReducer";
 import {CandidateDTO, VoteDTO} from "../Common/Data";
 import {useCookies} from "react-cookie";
 import {v4} from "uuid";
@@ -11,16 +11,31 @@ import {getVote, saveVote, submitVote} from "../Common/VoteModel";
 import {getElectionCandidates} from "../Common/ElectionModel";
 import {CardTable} from "../Components/Table";
 import {Card} from "../Components/Card";
+import {IoAdd} from "react-icons/io5";
 
 interface VoteViewState
 {
-    isReadOnly : boolean
     candidates: CandidateDTO[]
     choices : CandidateDTO[]
 }
 
+function vote_view_reducer(state : VoteViewState, action : CardTableAction<CandidateDTO>) : VoteViewState
+{
+    var newState = card_table_reducer<CandidateDTO>({
+        table: [state.candidates, state.choices],
+        editCard: (value,card) => {return {...card, value: value}}
+    }, action)
+
+    return {...state, candidates:newState.table[0], choices:newState.table[1]}
+}
+
 export function VoteView() {
-    var [tableState, dispatch] = useReducer(card_table_reducer, {table: [[],[]]})
+
+    const [cookies, setCookie] = useCookies(['userId'])
+    if (cookies.userId===undefined)
+    {
+        setCookie('userId', v4())
+    }
 
     let params = useParams();
 
@@ -30,17 +45,12 @@ export function VoteView() {
     }
     let electionId = params.electionId as string
 
-    var [{isReadOnly}, setState] = useState<VoteViewState>({
-        isReadOnly: false,
+    var [{isReadOnly}, setState] = useState({isReadOnly: false})
+
+    var [{candidates, choices}, dispatch] = useReducer(vote_view_reducer,{
         candidates: [],
         choices: []
     })
-
-    const [cookies, setCookie] = useCookies(['userId'])
-    if (cookies.userId===undefined)
-    {
-        setCookie('userId', v4())
-    }
 
     useEffect(() => {
         const fetchData = async () => {
@@ -49,19 +59,13 @@ export function VoteView() {
 
             if (electionResponse.response != null && voteResponse.response != null)
             {
-                let candidateCardData = electionResponse.response.candidates.map(c => {return {id:c.candidateId, text: c.value}})
-                let voteCardData = voteResponse.response.candidates.map(c => {return {id:c.candidateId, text: c.value}})
+                let candidateCardData = electionResponse.response.candidates
+                let voteCardData = voteResponse.response.candidates
 
-                candidateCardData = candidateCardData.filter(card => voteCardData.find(c => c.id === card.id) === undefined)
+                candidateCardData = candidateCardData.filter(card => voteCardData.find(c => c.candidateId=== card.candidateId) === undefined)
 
-                setState(state => {
-                    return {...state,
-                        isReadOnly:voteResponse?.response?.submitted ?? false,
-                        candidates: electionResponse?.response?.candidates ?? [],
-                        choices:voteResponse?.response?.candidates ?? [] }
-                })
-
-                dispatch({type:CardTableActionType.SetCards, cards: [candidateCardData, voteCardData]})
+                dispatch({type: CardTableActionType.SetCards, cards:[candidateCardData, voteCardData]})
+                setState({isReadOnly: voteResponse.response.submitted})
             }
         }
 
@@ -72,24 +76,13 @@ export function VoteView() {
     useEffect(() => {
 
         const saveData = async () => {
-            let cands: CandidateDTO[] = tableState.table[0].map(value => {return {electionId: electionId, candidateId: value.id, value: value.text}})
-            let chois : CandidateDTO[] = tableState.table[1].map(value => {return {electionId: electionId, candidateId: value.id, value: value.text}})
-
-            cands = cands.filter(card => chois.find(c => c.candidateId === card.candidateId) === undefined)
-
-            let voteDTO : VoteDTO = {submitted: false, candidates: chois}
+            let voteDTO : VoteDTO = {submitted: false, candidates: choices }
             var vote = await saveVote(electionId, cookies.userId, voteDTO)
-            if (vote.success)
-            {
-                setState(state => {
-                    return {...state, choices:chois, candidates: cands}
-                })
-            }
         }
 
         saveData().catch(e => console.log(e))
 
-    }, [tableState.table, cookies.userId, electionId])
+    }, [choices, cookies.userId, electionId])
 
     //TODO: If no election exists, show error
 
@@ -99,16 +92,16 @@ export function VoteView() {
         </div>
         <CardTable>
            <Column canEdit={false} canReorder={true} name={"Candidates"} column={0} showRank={false} dispatch={dispatch}>
-               {tableState.table[0].map((card, index) => {
-                    return <Card key={"card" + card.id} card={card}
+               {candidates.map((card, index) => {
+                    return <Card key={"card" + card.candidateId} id={card.candidateId} value={card.value}
                                  index={index} column={0}
                                  canEdit={false} canReorder={!isReadOnly} canDelete={false}
                                  dispatch={dispatch}/>
                })}
            </Column>
             <Column canEdit={false} canReorder={true} name={"Ranked Choices"} column={1} showRank={true} dispatch={dispatch}>
-                {tableState.table[1].map((card, index) => {
-                    return <Card key={"card" + card.id} card={card}
+                {choices.map((card, index) => {
+                    return <Card key={"card" + card.candidateId} id={card.candidateId} value={card.value}
                                  index={index} column={1}
                                  canEdit={false} canReorder={!isReadOnly} canDelete={!isReadOnly}
                                  dispatch={dispatch}/>

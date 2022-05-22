@@ -1,7 +1,8 @@
 import {CardData} from "../Components/Card";
-export interface CardTableState
+export interface CardTableState<T>
 {
-    table: CardData[][]
+    table: T[][]
+    editCard: (value:string, card: T)=>T
 }
 export enum CardTableActionType {
     SetCards,
@@ -10,14 +11,14 @@ export enum CardTableActionType {
     EditCard,
     MoveCard
 }
-export type CardTableAction =
-    | {type: CardTableActionType.SetCards, cards: CardData[][]}
-    | {type: CardTableActionType.AddCard, column:number}
+export type CardTableAction<T> =
+    | {type: CardTableActionType.SetCards, cards: T[][]}
+    | {type: CardTableActionType.AddCard, column:number, card: T}
     | {type: CardTableActionType.DeleteCard, index: number, column:number}
-    | {type: CardTableActionType.EditCard, card:CardData, index: number, column: number}
+    | {type: CardTableActionType.EditCard, value: string, index: number, column: number}
     | {type: CardTableActionType.MoveCard, sourceIndex: number, sourceColumn: number, destIndex : number, destColumn: number}
 
-function shortId(length : number = 8) : string
+export function shortId(length : number = 8) : string
 {
     const chars = "abcdefghijklmnopqrstubvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
     let result = ""
@@ -28,7 +29,7 @@ function shortId(length : number = 8) : string
 
     return result
 }
-export function card_table_reducer(state : CardTableState, action : CardTableAction) : CardTableState
+export function card_table_reducer<T>(state : CardTableState<T>, action : CardTableAction<T>) : CardTableState<T>
 {
     switch(action.type)
     {
@@ -40,7 +41,7 @@ export function card_table_reducer(state : CardTableState, action : CardTableAct
             return {...state, table: state.table.map((column, col) => {
                         if (col === action.column)
                         {
-                            return column.concat({text:"Card " + total, id:shortId()})
+                            return column.concat(action.card)
                         }
                         return column
                     }
@@ -59,7 +60,7 @@ export function card_table_reducer(state : CardTableState, action : CardTableAct
                     return column.map((card, index) => {
                         if (action.index === index && action.column === col)
                         {
-                            return action.card
+                            return state.editCard(action.value, card)
                         }
                         return card
                     })
