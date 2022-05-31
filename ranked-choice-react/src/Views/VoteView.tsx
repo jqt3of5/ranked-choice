@@ -55,7 +55,7 @@ export function VoteView() {
     }
     let electionId = params.electionId as string
 
-    var [{isReadOnly, dataRetrieved}, setState] = useState({isReadOnly: false, dataRetrieved: false})
+    var [{isReadOnly, isSubmitted, dataRetrieved}, setState] = useState({isReadOnly: false,isSubmitted: false, dataRetrieved: false})
 
     var [{allCandidates, candidates, choices}, dispatch] = useReducer(vote_view_reducer,{
         allCandidates: [],
@@ -73,7 +73,7 @@ export function VoteView() {
             let voteCardData = voteResponse.response.candidates
 
             dispatch({type: CardTableActionType.SetCards, cards:[candidateCardData, voteCardData]})
-            setState({isReadOnly: voteResponse.response.submitted, dataRetrieved: true})
+            setState({isSubmitted:voteResponse.response.submitted, isReadOnly: voteResponse.response.submitted, dataRetrieved: true})
         }
     }
 
@@ -84,8 +84,12 @@ export function VoteView() {
     }, [])
 
     const saveData = async () => {
+        setState(state => {return {...state, isReadOnly: true}})
+
         let voteDTO : VoteDTO = {submitted: false, candidates: choices }
         var vote = await saveVote(electionId, cookies.userId, voteDTO)
+
+        setState(state => {return {...state, isReadOnly: false}})
     }
 
     useEffect(() => {
@@ -101,13 +105,13 @@ export function VoteView() {
 
     return <div className={"vote-view"}>
         <div className={"vote-view-header primary"}>
-            {!isReadOnly && <button onClick={() =>
+            {!isSubmitted && <button onClick={() =>
                 submitVote(electionId, cookies.userId)
                 .then(response =>
-                    setState(state => {return {...state, isReadOnly:true}}))}>
+                    setState(state => {return {...state, isSubmitted:true, isReadOnly:true}}))}>
                 Submit Vote
             </button>}
-            {isReadOnly && <label>Submitted!</label>}
+            {isSubmitted && <label>Submitted!</label>}
 
         </div>
         <CardTable>

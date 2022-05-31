@@ -207,7 +207,9 @@ namespace RankedChoiceServerless
             election.SaveSettings(settings.uniqueIdsPerUser, settings.electionName);
 
             await repo.Save(election);
-            return new ElectionResponse(string.Empty, true, null).toResponse();
+            
+            var result = new ElectionSettingsDTO(electionId, election.UniqueIdsPerUser, election.Users.Select(u => u.email).ToArray(), election.ElectionName, election.State);
+            return new ElectionResponse(string.Empty, true, result).toResponse();
         }
         
         public async Task<APIGatewayProxyResponse> SaveCandidates(APIGatewayProxyRequest apiProxyEvent, ILambdaContext context)
@@ -241,7 +243,11 @@ namespace RankedChoiceServerless
             
             await repo.Save(election);
             
-            return new ElectionResponse(string.Empty, true, null).toResponse();
+            var result = new ElectionDTO(electionId, 
+                election.Candidates.Select(c => 
+                    new CandidateDTO(c.value, c.candidateId)).ToArray()
+            );
+            return new ElectionResponse(string.Empty, true, result).toResponse();
         }
     }
 }

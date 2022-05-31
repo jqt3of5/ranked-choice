@@ -16,7 +16,6 @@ namespace RankedChoiceServerless
     {
         public async Task<APIGatewayProxyResponse> SaveCandidates(APIGatewayProxyRequest apiProxyEvent, ILambdaContext context)
         {
-            //TODO: Doesn't respect election status
             var candidateIds= JsonConvert.DeserializeObject<string[]>(apiProxyEvent.Body);
             var userId = apiProxyEvent.Headers["userid"];
             var electionId = apiProxyEvent.PathParameters["electionId"];
@@ -38,6 +37,15 @@ namespace RankedChoiceServerless
                     return new VoteResponse($"Election with Id {electionId} doesn't exist, or user with id {userId} isn't allowed to vote in this election",
                             false, null)
                         .toResponse(404);
+                }
+
+                if (election.State != ElectionState.Started)
+                {
+                    LambdaLogger.Log(
+                        $"Election with Id {electionId} has a status {election.State.ToString()} and it not taking votes");
+                    return new VoteResponse($"Election with Id {electionId} doesn't exist, or user with id {userId} isn't allowed to vote in this election",
+                            false, null)
+                        .toResponse(500); 
                 }
 
                 var voteRepository = new VoteRepository();
@@ -78,7 +86,14 @@ namespace RankedChoiceServerless
            
                 await voteRepository.SaveForUser(userId, electionId, entity);
                 LambdaLogger.Log($"Successfully saved candidate selections");
-                return new VoteResponse(string.Empty, true, null).toResponse();
+                
+                var dtos = election.Candidates
+                    .Where(c => entity.Candidates.Any(d=> d.candidateId == c.candidateId))
+                    .Select(e => new CandidateDTO(e.value, e.candidateId))
+                    .ToArray();
+                var vote = new VoteDTO(entity.Submitted, dtos);
+                
+                return new VoteResponse(string.Empty, true, vote).toResponse();
             }
             catch (Exception e)
             {

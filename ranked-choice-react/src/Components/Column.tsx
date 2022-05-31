@@ -45,12 +45,12 @@ export function Column<T>(props : ColumnProps<T>) {
                 <label>{props.name}</label>
             </div>
 
-            { props.children.map((card, index) =>
-                <div key={"div" + index} className={"column-row"}>
+            { React.Children.map(props.children, (card, index) => {
+                return <div key={"div" + index} className={"column-row"}>
                     {props.showRank && <label><b>{index}</b> </label>}
                     {card}
-                </div>
-            )}
+                </div>})
+            }
 
             {/*If we are showing the rank, then we also want to show 5 placeholders*/}
             {/*props.showRank && props.cards.length < 5 && [...Array(5 - props.cards.length)].map((value, index) =>
